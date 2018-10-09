@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<p>
+    服务器地址(ws://localhost:9501) <input onchange="webSc.setHost(this.value)" value="ws://localhost:9501">
+</p>
+<p>
+    <input id="msg">
+    <button onclick="webSc.send(msg.value);document.getElementById('list').innerHTML+=msg.value+'<br/>'">发送</button>
+</p>
+<p>
+    <button onclick="webSc.init(function(data){document.getElementById('list').innerHTML+=data+'<br/>'})">启动连接</button>
+    <button onclick="webSc.reStart()">重新连接</button>
+    <button onclick="webSc.close()">关闭连接</button>
+</p>
+<p> msg list</p>
+<p id="list" style="    background-color: #d4d4d4;">
+    <br/>
+</p>
+<p>php Swoole Server Code</p>
+<pre>
+
+$server = new swoole_websocket_server("127.0.0.1", 9501);
+
+$server->on('open', function($server, $req) {
+    echo "connection open: {$req->fd}\n";
+});
+
+$server->on('message', function($server, $frame) {
+    echo "received message: {$frame->data}\n";
+    if($frame->data!='heartbeat')
+    $server->push($frame->fd, json_encode(["hello", "world"]));
+});
+
+$server->on('close', function($server, $fd) {
+    echo "connection close: {$fd}\n";
+});
+
+$server->start();
+
+
+
+----------------easyswoole 3.x -------------------------
+-------file EasySwooleEvent.php-------------------------
+    public static function mainServerCreate(EventRegister $register)
+    {
+        // TODO: Implement mainServerCreate() method.
+          $register->set('open', function($server, $req) {
+            echo "connection open: {$req->fd}\n";
+           });
+          $register->set('message', function($server, $frame) {
+              echo "received message: {$frame->data}\n";
+              if($frame->data!='heartbeat')
+                  $server->push($frame->fd, json_encode(["hello", "world"]));
+          });
+          $register->set('close', function($server, $fd) {
+              echo "connection close: {$fd}\n";
+          });
+    }
+</pre>
+</body>
+<script>
+    var webSc = {
+        host:"ws://localhost:9501",
+        interval:'1000',
+        initPower:0,
+        ws:null,
+        closePower:1,
+        HB:null,
+        runServer:null,
+        setHost:function(host){
+            this.host =  host;
+        },
+        setIntervalTime:function(interval){
+            this.interval = interval*1000;
+        },
+        init:function(runCallback){
+            let self = this;
+            self.ws = new WebSocket(self.host);
+            self.ws.onopen = function(evt) {
+                console.log("Connection open ...");
+                self.HB = setInterval(function(){
+                    if(self.closePower == 1){
+                        const json = {
+                            class: 'heartbeat',
+                            action: 'index'
+                        };
+                        self.ws.send(JSON.stringify(json));
+                    }else{
+                        clearInterval(self.Hb);
+                    }
+                },self.interval);
+                self.initPower=1;
+            };
+            self.ws.onmessage = function(evt) {
+                console.log("Received Message: " + evt.data);
+                if(typeof runCallback == "function"){
+                    self.runServer = runCallback;
+                    runCallback(evt.data);
+                }
+            };
+            self.ws.onclose = function(evt) {
+                console.log(self);
+                if(self.closePower == 1){
+                    self.init(runCallback);
+                }
+                self.initPower = 0;
+            };
+        },
+        close:function(){
+            let self = this;
+            if(self.ws){
+                self.initPower = 0;
+                self.closePower = 0;
+                self.ws.close();
+                clearInterval(self.HB);
+            }
+        },
+        reStart:function(){
+            let self = this;
+            self.close();
+            setTimeout(function(){
+                self.closePower = 1;
+                self.initPower = 1;
+                self.init(self.runServer);
+            },500);
+            return true;
+        },
+        send:function(data){
+            let self = this;
+            if(self.initPower == 1){
+                const json = {
+                    class: 'info',
+                    action: 'index',
+                    data: {
+                        text: data
+                    }
+                };
+                self.ws.send(JSON.stringify(json));
+            }else{
+                alert("please run init function");
+            }
+        }
+    }
+</script>
+</html>
+
