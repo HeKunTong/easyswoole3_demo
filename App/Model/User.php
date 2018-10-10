@@ -9,7 +9,15 @@
 namespace App\Model;
 
 
-class User
+class User extends Base
 {
+    protected $table = 'test';
 
+    function getList(){
+        return $this->getDb()->get($this->table);
+    }
+
+    function getUser(UserBean $user) {
+        return $this->getDb()->where('id', $user->getId())->getOne($this->table);
+    }
 }
