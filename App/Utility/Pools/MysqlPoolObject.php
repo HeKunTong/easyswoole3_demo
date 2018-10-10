@@ -9,7 +9,9 @@
 namespace App\Utility\Pools;
 
 
-class MysqlPoolObject extends \MysqliDb
+use EasySwoole\Component\Pool\PoolObjectInterface;
+
+class MysqlPoolObject extends \MysqliDb implements PoolObjectInterface
 {
     function __construct($config)
     {
