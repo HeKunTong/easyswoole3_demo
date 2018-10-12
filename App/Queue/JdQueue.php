@@ -28,9 +28,9 @@ class JdQueue
         }
     }
 
-    function lPop()
+    function rPop()
     {
-        return $this->redis->lPop($this->queue);
+        return $this->redis->rPop($this->queue);
     }
 
     function lPush($data)
