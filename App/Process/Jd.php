@@ -26,7 +26,7 @@ class Jd extends AbstractProcess
                 $task = $queue->lPop();
                 if($task) {
                     echo '======'.$task.'======'.PHP_EOL;
-                    $goodTask->add($task);
+                    $goodTask->handle($task);
                 } else {
                     echo 'end-----'.PHP_EOL;
                 }

@@ -15,7 +15,7 @@ use EasySwoole\Curl\Request;
 
 class JdGood
 {
-    function add($url)
+    function handle($url)
     {
         $request = new Request($url);
         $body = $request->exec()->getBody();
