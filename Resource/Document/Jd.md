@@ -83,7 +83,7 @@
         }
     }
 ```
-    处理链接逻辑如下：
+   处理链接逻辑如下：
     
 ```
     class JdGood
@@ -139,6 +139,7 @@
         }
     }
 ```   
+   ！[结果]（https://raw.githubusercontent.com/HeKunTong/easyswoole3_demo/master/Resource/Images/jd.png）
 
  
     
