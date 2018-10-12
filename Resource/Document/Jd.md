@@ -139,7 +139,7 @@
         }
     }
 ```  
-   ![结果](/Resource/Images/jd.png) 
+   ![结果](/Resource/Images/jd.png)
 
  
     
