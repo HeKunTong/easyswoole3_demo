@@ -11,6 +11,7 @@ namespace App\HttpController;
 
 use App\Model\User;
 use App\Model\UserBean;
+use App\Task\Jd;
 use App\Utility\Pools\RedisPool;
 use EasySwoole\Component\Pool\PoolManager;
 use EasySwoole\EasySwoole\ServerManager;
@@ -68,13 +69,25 @@ class Duck extends REST
         $this->writeJson(200, $user);
     }
 
-    public function GETNotify() {
+    public function GETNotify()
+    {
         $this->response()->write('notify...');
     }
 
-    public function GETPublish() {
+    public function GETPublish()
+    {
         $this->redis->publish('ch1', 'hello world');
         $this->response()->write('publish...');
+    }
+
+    public function GETGoods()
+    {
+        \Co::create(function (){
+            $jd = new Jd();
+            $jd->run();
+        });
+
+        $this->response()->write('goods is adding!');
     }
 
 }

@@ -27,20 +27,20 @@ class RedisPool extends AbstractPool
         }
         $conf = Config::getInstance()->getConf('REDIS');
         $redis = new Redis;
-
         if ($conf['persistent'] != 'false') {
-            $redis->pconnect($conf['host'], $conf['port'], intval($conf['timeout']), 'persistent_id_'.$conf['select']);
+            $redis->pconnect($conf['host'], $conf['port'], $conf['timeout'], 'persistent_id_'.$conf['select']);
         } else {
-            $redis->connect($conf['host'], $conf['port'], intval($conf['timeout']));
+            $redis->connect($conf['host'], $conf['port'], $conf['timeout']);
         }
 
-        if ('' !== $conf['password']) {
+        if (!empty($conf['password'])) {
             $redis->auth($conf['password']);
         }
 
-        if ('0' !== $conf['select']) {
-            $redis->select(intval($conf['select']));
+        if (0 !== $conf['select']) {
+            $redis->select($conf['select']);
         }
+
         return $redis;
     }
 }
