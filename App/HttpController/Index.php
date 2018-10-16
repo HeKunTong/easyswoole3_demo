@@ -70,6 +70,7 @@ class Index extends Controller
      */
     function async() {
         TaskManager::async(new Async('async'));
+        $this->response()->write('async...');
     }
 
     /**
