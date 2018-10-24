@@ -9,7 +9,7 @@
 namespace App\Task;
 
 
-use App\Queue\JdQueue;
+use App\Queue\Queue;
 use EasySwoole\Curl\Request;
 
 class Jd
@@ -24,25 +24,30 @@ class Jd
             'ev' => 'exbrand_14026',
             'sort' => 'sort_rank_asc',
             'trans' => 1,
-            'JL' => '3_品牌_Apple#J_crumbsBar'
+            'JL' => '3_品牌_Apple'
         ];
         $url = $url.'?'.http_build_query($params);
+        echo $url.PHP_EOL;
         $request = new Request($url);
         $request->setUserOpt([CURLOPT_REFERER => 'https://list.jd.com/list.html?cat=9987,653,655']);
         $body = $request->exec()->getBody();
         $html = new \simple_html_dom();
         $html->load($body);
-        $currentPage = 'https://list.jd.com'.$html->find('.p-num a.curr', 0)->href;
-        $total = intval($html->find('.p-skip b', 0)->plaintext);
-        $i = 2;
-        echo $currentPage.PHP_EOL;
-        $queue = new JdQueue();
-        $queue->lPush($currentPage);
-        while($i <= $total) {
-            $page = str_replace('page=1', "page=$i", $currentPage);
-            echo $page.PHP_EOL;
-            $queue->lPush($page);
-            $i++;
+        $curr = $html->find('.p-num a.curr', 0);
+        $skip = $html->find('.p-skip b', 0);
+        if (!empty($curr) && !empty($skip)) {
+            $currentPage = 'https://list.jd.com'.$curr->href;
+            $total = intval($skip->plaintext);
+            $i = 2;
+            echo $currentPage.PHP_EOL;
+            $queue = new Queue();
+            $queue->lPush($currentPage);
+            while($i <= $total) {
+                $page = str_replace('page=1', "page=$i", $currentPage);
+                echo $page.PHP_EOL;
+                $queue->lPush($page);
+                $i++;
+            }
         }
     }
 }

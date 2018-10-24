@@ -22,8 +22,8 @@ class Install
         $path = '.'.str_replace(EASYSWOOLE_ROOT,'',__FILE__);
         file_put_contents(EASYSWOOLE_ROOT . '/easyswoole',"<?php require '{$path}';");
         self::releaseResource(__DIR__ . '/../src/Resource/EasySwooleEvent.tpl', EASYSWOOLE_ROOT . '/EasySwooleEvent.php');
-        self::releaseResource(__DIR__ . '/../src/Resource/dev.env', EASYSWOOLE_ROOT . '/dev.env');
-        self::releaseResource(__DIR__ . '/../src/Resource/produce.env', EASYSWOOLE_ROOT . '/produce.env');
+        self::releaseResource(__DIR__ . '/../src/Resource/config.env', EASYSWOOLE_ROOT . '/dev.env');
+        self::releaseResource(__DIR__ . '/../src/Resource/config.env', EASYSWOOLE_ROOT . '/produce.env');
     }
 
     static function showTag($name, $value)
@@ -173,6 +173,10 @@ switch ($mainCommand){
         }
         Install::showTag('listen address', $conf->getConf('MAIN_SERVER.HOST'));
         Install::showTag('listen port', $conf->getConf('MAIN_SERVER.PORT'));
+        $ips = swoole_get_local_ip();
+        foreach ($ips as $eth => $val){
+            Install::showTag('ip@'.$eth, $val);
+        }
         Install::showTag('worker num', $conf->getConf('MAIN_SERVER.SETTING.worker_num'));
         Install::showTag('task worker num', $conf->getConf('MAIN_SERVER.SETTING.task_worker_num'));
         $user = $conf->getConf('MAIN_SERVER.SETTING.user');
@@ -267,6 +271,24 @@ switch ($mainCommand){
             echo "send server reload command at " . date("y-m-d h:i:s") . "\n";
         } else {
             echo "PID file does not exist, please check whether to run in the daemon mode!\n";
+        }
+        break;
+    }
+
+    case 'console':{
+        if(in_array('produce',$commandList)){
+            \EasySwoole\EasySwoole\Core::getInstance()->setIsDev(false);
+        }
+        \EasySwoole\EasySwoole\Core::getInstance()->initialize();
+        $conf = \EasySwoole\EasySwoole\Config::getInstance()->getConf('CONSOLE');
+        $client = new \EasySwoole\EasySwoole\Console\Client($conf['HOST'],$conf['PORT']);
+        if($client->connect()){
+            swoole_event_add(STDIN,function()use($client){
+                $ret = trim(fgets(STDIN));
+                $client->sendCommand($ret);
+            });
+        }else{
+            fwrite(STDOUT, "connect to  tcp://{$this->host}:{$this->port} fail \n");
         }
         break;
     }

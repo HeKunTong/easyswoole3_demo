@@ -9,6 +9,8 @@
 namespace App\HttpController;
 
 
+use App\Model\Goods\GoodBean;
+use App\Model\Goods\Goods;
 use App\Task\Async;
 use EasySwoole\Curl\Request;
 use EasySwoole\EasySwoole\Swoole\Task\TaskManager;
@@ -70,6 +72,7 @@ class Index extends Controller
      */
     function async() {
         TaskManager::async(new Async('async'));
+        // TaskManager::sync(new Async('async'));
         $this->response()->write('async...');
     }
 
@@ -92,5 +95,14 @@ class Index extends Controller
 
     function reload() {
         $this->response()->write('reload');
+    }
+
+    function db()
+    {
+        $bean = new GoodBean();
+        $bean->setGoodsId('20181017001');
+        $bean->setGoodsName('节日大礼包');
+        $model = new Goods();
+        $model->add($bean);
     }
 }

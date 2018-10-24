@@ -2,7 +2,7 @@
 /.idea/
 
 # composer
-/vendor
+/vendor/
 composer.lock
 
 # easySwoole

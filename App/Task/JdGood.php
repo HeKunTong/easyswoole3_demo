@@ -21,7 +21,7 @@ class JdGood
         $body = $request->exec()->getBody();
         $html = new \simple_html_dom();
         $html->load($body);
-        $list = $html->find('.gl-warp', 0);
+        $list = $html->find('ul.gl-warp', 0);
         $len = count($list->find('.gl-item'));
         $skus = [];
         for ($i = 0; $i < $len; $i++) {
@@ -52,6 +52,7 @@ class JdGood
         ];
         $url = $url.'?'.http_build_query($params);
         $request = new Request($url);
+
         $result = json_decode($request->exec()->getBody(), true);
 
         foreach ($result as $item) {

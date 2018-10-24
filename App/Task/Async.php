@@ -11,6 +11,7 @@ namespace App\Task;
 
 
 use EasySwoole\EasySwoole\Swoole\Task\AbstractAsyncTask;
+use EasySwoole\EasySwoole\Swoole\Time\Timer;
 
 class Async extends AbstractAsyncTask
 {
@@ -18,8 +19,10 @@ class Async extends AbstractAsyncTask
     function run($taskData, $taskId, $fromWorkerId)
     {
         // TODO: Implement run() method.
-        echo $taskData.'   ...'.PHP_EOL;
-        return $taskData;
+        Timer::delay(3000, function () use($taskData){
+            echo $taskData.'   ...'.PHP_EOL;
+            return $taskData;
+        });
     }
 
     function finish($result, $task_id)

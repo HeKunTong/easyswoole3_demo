@@ -13,10 +13,10 @@ use App\Utility\Pools\RedisPool;
 use EasySwoole\Component\Pool\PoolManager;
 use Swoole\Coroutine\Redis;
 
-class JdQueue
+class Queue
 {
     private $redis;
-    private $queue = 'queue';
+    static public $queue = 'queue';
 
     function __construct()
     {
@@ -28,21 +28,24 @@ class JdQueue
         }
     }
 
+    function __destruct()
+    {
+        // TODO: Implement __destruct() method.
+        if ($this->redis instanceof Redis) {
+            PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($this->redis );
+        }
+    }
+
     function rPop()
     {
-        return $this->redis->rPop($this->queue);
+        $rs = $this->redis->rPop(self::$queue);
+        return $rs;
     }
 
     function lPush($data)
     {
-        $this->redis->lpush($this->queue, $data);
+        $rs = $this->redis->lpush(self::$queue, $data);
+        return $rs;
     }
 
-    function __destruct()
-    {
-        // TODO: Implement __destruct() method.
-//        if ($this->redis instanceof Redis) {
-//            PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($this->redis );
-//        }
-    }
 }

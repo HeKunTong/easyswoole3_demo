@@ -2,16 +2,17 @@
 /**
  * Created by PhpStorm.
  * User: yf
- * Date: 2018/7/29
- * Time: 上午11:46
+ * Date: 2018/10/24
+ * Time: 下午2:25
  */
 
-namespace EasySwoole\EasySwoole\Swoole\PipeMessage;
+namespace EasySwoole\EasySwoole\Console;
+
 
 use EasySwoole\Component\Event;
 use EasySwoole\Component\Singleton;
 
-class OnCommand extends Event
+class CommandContainer extends Event
 {
     use Singleton;
 }
