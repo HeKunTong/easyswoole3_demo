@@ -8,8 +8,6 @@
 
 namespace App\Utility\Pool;
 
-
-use App\Utility\Pool\RedisObject;
 use EasySwoole\Component\Pool\AbstractPool;
 use EasySwoole\EasySwoole\Config;
 
