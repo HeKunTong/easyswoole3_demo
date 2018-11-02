@@ -10,7 +10,6 @@ namespace App\Task;
 
 
 use App\Queue\Queue;
-use App\Queue\RedisBase;
 use EasySwoole\Curl\Request;
 
 class Jd
@@ -49,7 +48,6 @@ class Jd
                 $queue->lPush($page);
                 $i++;
             }
-            unset($redis);
         }
     }
 }
