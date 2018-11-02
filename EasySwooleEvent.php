@@ -35,8 +35,8 @@ class EasySwooleEvent implements Event
 
         // 注入redis池和mysql池
 
-        PoolManager::getInstance()->register(RedisPool::class, Config::getInstance()->getConf('MYSQL.POOL_MAX_NUM'));
-        PoolManager::getInstance()->register(MysqlPool::class, Config::getInstance()->getConf('REDIS.POOL_MAX_NUM'));
+        PoolManager::getInstance()->register(RedisPool::class, Config::getInstance()->getConf('REDIS.POOL_MAX_NUM'));
+        PoolManager::getInstance()->register(MysqlPool::class, Config::getInstance()->getConf('MYSQL.POOL_MAX_NUM'));
     }
 
     public static function mainServerCreate(EventRegister $register)

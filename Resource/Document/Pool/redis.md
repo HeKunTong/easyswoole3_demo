@@ -15,7 +15,7 @@ REDIS.POOL_MAX_NUM = 4
   
 在EasySwooleEvent.php的initialize方法注册redis连接池
 ```php
-PoolManager::getInstance()->register(RedisPool::class, Config::getInstance()->getConf('MYSQL.POOL_MAX_NUM'));
+ PoolManager::getInstance()->register(RedisPool::class, Config::getInstance()->getConf('REDIS.POOL_MAX_NUM'));
 ```  
 
 > redis连接池类
