@@ -8,8 +8,6 @@
 
 namespace App\Queue;
 
-
-use App\Utility\Pool\RedisObject;
 use App\Utility\Pool\RedisPool;
 use EasySwoole\Component\Pool\PoolManager;
 

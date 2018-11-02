@@ -9,9 +9,9 @@
 namespace App\Model\Goods;
 
 
-use App\Model\Base;
+use App\Model\BaseModel;
 
-class Goods extends Base
+class Goods extends BaseModel
 {
 
     protected $tableName = 'goods_list';

@@ -9,10 +9,25 @@
 namespace App\Task;
 
 
+use App\Model\DianPing\DianPingModel;
 use App\Queue\Queue;
+use App\Utility\Pool\MysqlPool;
+use EasySwoole\Component\Pool\PoolManager;
 
 class DianPing
 {
+    private $db;
+
+    function __construct()
+    {
+        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
+        if ($db) {
+            $this->db = $db;
+        } else {
+            throw new \Exception('mysql pool is empty');
+        }
+    }
+
     function run() {
         $url = 'http://www.dianping.com/xiamen/ch10/r8085';
         $root = EASYSWOOLE_ROOT;
@@ -31,13 +46,18 @@ class DianPing
     }
 
     function detail() {
-        $model = new \App\Model\DianPing\DianPing();
+        $model = new DianPingModel($this->db);
         $list = $model->getList();
         $queue = new Queue();
         foreach ($list as $item) {
             $queue->lPush("http://www.dianping.com/shop/".$item['shopId']);
             echo "http://www.dianping.com/shop/".$item['shopId'].PHP_EOL;
         }
-        unset($model);
+    }
+
+    function __destruct()
+    {
+        // TODO: Implement __destruct() method.
+        PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($this->db);
     }
 }

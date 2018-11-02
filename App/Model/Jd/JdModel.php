@@ -6,12 +6,13 @@
  * Time: 下午3:18
  */
 
-namespace App\Model;
+namespace App\Model\Jd;
 
 
+use App\Model\BaseModel;
 use EasySwoole\Spl\SplBean;
 
-class Jd extends Base
+class JdModel extends BaseModel
 {
     private $table = 'jd';
 

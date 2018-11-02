@@ -9,10 +9,10 @@
 namespace App\Model\DianPing;
 
 
-use App\Model\Base;
+use App\Model\BaseModel;
 use EasySwoole\Spl\SplBean;
 
-class DianPing extends Base
+class DianPingModel extends BaseModel
 {
     protected $table = 'dian_ping';
 

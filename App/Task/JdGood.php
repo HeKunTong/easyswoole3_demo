@@ -9,12 +9,26 @@
 namespace App\Task;
 
 
-use App\Model\JdBean;
-use App\Model\Jd;
+use App\Model\Jd\JdBean;
+use App\Model\Jd\JdModel;
+use App\Utility\Pool\MysqlPool;
+use EasySwoole\Component\Pool\PoolManager;
 use EasySwoole\Curl\Request;
 
 class JdGood
 {
+    protected $db;
+
+    function __construct()
+    {
+        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
+        if ($db) {
+            $this->db = $db;
+        } else {
+            throw new \Exception('mysql pool is empty');
+        }
+    }
+
     function handle($url)
     {
         $request = new Request($url);
@@ -36,10 +50,8 @@ class JdGood
                 'sku' => $sku,
             ];
             $bean = new JdBean($data);
-            $model = new Jd();
+            $model = new JdModel($this->db);
             $model->insert($bean);
-            unset($bean);
-            unset($model);
         }
         $this->getPrice($skus);
     }
@@ -60,9 +72,14 @@ class JdGood
             $price = floatval($item['p']) * 100;
             $bean = new JdBean();
             $bean->setSku($sku);
-            $model = new Jd();
+            $model = new JdModel($this->db);
             $model->update($bean, $price);
-            unset($model);
         }
+    }
+
+    function __destruct()
+    {
+        // TODO: Implement __destruct() method.
+        PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($this->db);
     }
 }

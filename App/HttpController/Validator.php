@@ -12,13 +12,8 @@ namespace App\HttpController;
 use EasySwoole\Http\AbstractInterface\REST;
 use EasySwoole\Validate\Validate;
 
-class User extends REST
+class Validator extends REST
 {
-
-    public function GETInfo()
-    {
-        $this->response()->write('info.....');
-    }
 
     function GETValid()
     {

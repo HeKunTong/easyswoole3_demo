@@ -8,13 +8,28 @@
 
 namespace App\Task;
 
-
 use App\Model\DianPing\DianPingBean;
 use App\Model\DianPing\DianPing;
+use App\Model\DianPing\DianPingModel;
+use App\Utility\Pool\MysqlPool;
+use EasySwoole\Component\Pool\PoolManager;
 use EasySwoole\Curl\Request;
 
 class DianPingTask
 {
+
+    protected $db;
+
+    function __construct()
+    {
+        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
+        if ($db) {
+            $this->db = $db;
+        } else {
+            throw new \Exception('mysql pool is empty');
+        }
+    }
+
     function handle($url) {
         $root = EASYSWOOLE_ROOT;
         $content = shell_exec("phantomjs $root/Html/food.js $url");
@@ -77,7 +92,7 @@ class DianPingTask
                 'service' => $service
             ];
             $bean = new DianPingBean($item);
-            $model = new DianPing();
+            $model = new DianPingModel($this->db);
             $model->insert($bean);
             unset($bean);
             unset($model);
@@ -86,7 +101,7 @@ class DianPingTask
 
     function getPosition($url) {
         $shopId = str_replace('http://www.dianping.com/shop/', '', $url);
-        $model = new DianPing();
+        $model = new DianPingModel($this->db);
         $root = EASYSWOOLE_ROOT;
         $content = shell_exec("phantomjs $root/Html/food.js $url");
         if ($content == 'Unable to access network') {
@@ -122,30 +137,17 @@ class DianPingTask
                         }
                     }
                 }
-//                if (!empty($latitude) || !empty($longitude) || !empty($thumb)) {
-//                    $params = [
-//                        'latitude' => $latitude,
-//                        'longitude' => $longitude,
-//                        'thumb' => $thumb
-//                    ];
-//                    $bean = new DianPingBean($params);
-//                    $model->update($shopId, $bean);
-//                }
-            } else {
-//                $this->resolveLocation($url);
+                if (!empty($latitude) || !empty($longitude) || !empty($thumb)) {
+                    $params = [
+                        'latitude' => $latitude,
+                        'longitude' => $longitude,
+                        'thumb' => $thumb
+                    ];
+                    $bean = new DianPingBean($params);
+                    $model->update($shopId, $bean);
+                }
             }
         }
         unset($model);
-    }
-
-    function resolveLocation($url) {
-        $request = new Request($url);
-        $time = time();
-        $request->setUserOpt([CURLOPT_COOKIE=> "_lxsdk_cuid=$time;"]);
-        $headerLine = $request->exec()->getHeaderLine();
-        preg_match_all("/Location: (.*?)\r\n/", $headerLine, $match);
-        $url = $match[1][0];
-        preg_match_all('/requestCode=([^&]+)/', $url, $requestMatch);
-
     }
 }

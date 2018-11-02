@@ -6,7 +6,7 @@
  * Time: 下午3:18
  */
 
-namespace App\Model;
+namespace App\Model\Jd;
 
 
 use EasySwoole\Spl\SplBean;

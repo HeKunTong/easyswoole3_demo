@@ -6,12 +6,14 @@
  * Time: 下午4:29
  */
 
-namespace App\Model;
+namespace App\Model\User;
 
 
-class User extends Base
+use App\Model\BaseModel;
+
+class UserModel extends BaseModel
 {
-    protected $table = 'test';
+    protected $table = 'user';
 
     function getList(){
         return $this->getDb()->get($this->table);

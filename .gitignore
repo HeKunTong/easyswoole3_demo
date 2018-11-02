@@ -9,7 +9,7 @@ composer.lock
 /Log/
 /Temp/
 /easyswoole
-easyswoole.install
-src/swoole_log.txt
-/EasySwooleEvent.php
 
+dev.env
+
+produce.env
