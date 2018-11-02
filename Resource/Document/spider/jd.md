@@ -175,3 +175,16 @@ class JdGood
 
 1. 采集手机名，sku以及店铺
 2. 采集手机价格
+
+> 数据表结构
+
+```sql
+CREATE TABLE `jd` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `sku` varchar(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `price` int(11) DEFAULT NULL,
+  `shop` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=806 DEFAULT CHARSET=utf8mb4;
+```
