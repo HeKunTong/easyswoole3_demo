@@ -8,28 +8,16 @@
 
 namespace App\Queue;
 
-use App\Utility\Pool\RedisPool;
-use EasySwoole\Component\Pool\PoolManager;
+use App\Utility\Pool\RedisObject;
 
 class Queue
 {
     private $redis;
     static public $queue = 'queue';
 
-    function __construct()
+    function __construct(RedisObject $redis)
     {
-        $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
-        if ($redis) {
-            $this->redis = $redis;
-        } else {
-            throw new \Exception('Redis pool is empty');
-        }
-    }
-
-    function __destruct()
-    {
-        // TODO: Implement __destruct() method.
-        PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($this->redis);
+        $this->redis = $redis;
     }
 
     function rPop()

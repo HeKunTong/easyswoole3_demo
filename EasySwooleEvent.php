@@ -67,32 +67,43 @@ class EasySwooleEvent implements Event
 //                        echo 'count'.$count.PHP_EOL;
 //                    }
 //                });
-
                 \Co::create(function (){
-//                    $jd = new Jd();
-//                    $jd->run();
+                    $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
+                    if ($redis) {
+                        $jd = new Jd($redis);
+                        $jd->run();
+                    } else {
+                        echo 'redis pool is empty'.PHP_EOL;
+                    }
                 });
 
                 // 定时任务
                 $timer = Timer::loop(1 * 1000, function () use (&$timer) {
-                    for($i = 1; $i <= 2; $i++) {
-                        $queue = new Queue();
-                        \Co::create(function () use (&$timer, $queue){
-                            $goodTask = new JdGood();
+                    \Co::create(function () use (&$timer){
+                        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
+                        $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
+                        if ($db && $redis) {
+                            $queue = new Queue($redis);
+                            $goodTask = new JdGood($db);
                             $task = $queue->rPop();
                             if($task) {
                                 echo 'task-----'.$task.PHP_EOL;
                                 $goodTask->handle($task);
                             } else {
                                 echo 'end-----'.PHP_EOL;
-                                if ($timer) {
-                                    Timer::clear($timer);
-                                }
                             }
-                            unset($goodTask);
-                        });
-                        unset($queue);
-                    }
+                            PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
+                            PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
+                        } else {
+                            if ($redis) {
+                                echo 'mysql pool is empty'.PHP_EOL;
+                                PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
+                            } else {
+                                echo 'redis pool is empty'.PHP_EOL;
+                                PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
+                            }
+                        }
+                    });
                 });
             }
         });

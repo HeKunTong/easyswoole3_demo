@@ -11,22 +11,16 @@ namespace App\Task;
 
 use App\Model\Jd\JdBean;
 use App\Model\Jd\JdModel;
-use App\Utility\Pool\MysqlPool;
-use EasySwoole\Component\Pool\PoolManager;
+use App\Utility\Pool\MysqlPoolObject;
 use EasySwoole\Curl\Request;
 
 class JdGood
 {
     protected $db;
 
-    function __construct()
+    function __construct(MysqlPoolObject $db)
     {
-        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
-        if ($db) {
-            $this->db = $db;
-        } else {
-            throw new \Exception('mysql pool is empty');
-        }
+        $this->db = $db;
     }
 
     function handle($url)
@@ -75,11 +69,5 @@ class JdGood
             $model = new JdModel($this->db);
             $model->update($bean, $price);
         }
-    }
-
-    function __destruct()
-    {
-        // TODO: Implement __destruct() method.
-        PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($this->db);
     }
 }
