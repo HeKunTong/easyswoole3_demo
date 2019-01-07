@@ -8,19 +8,16 @@
 
 namespace EasySwoole\EasySwoole;
 
-
 use App\Process\Inotify;
 use App\Queue\Queue;
-use App\Task\DianPing;
 use App\Task\Jd;
 use App\Task\JdGood;
 use App\Utility\Pool\MysqlPool;
 use App\Utility\Pool\RedisPool;
 use EasySwoole\Component\Pool\PoolManager;
+use EasySwoole\Component\Timer;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\EasySwoole\AbstractInterface\Event;
-use EasySwoole\EasySwoole\Swoole\Process\Helper;
-use EasySwoole\EasySwoole\Swoole\Time\Timer;
 use EasySwoole\Http\Request;
 use EasySwoole\Http\Response;
 
@@ -30,7 +27,7 @@ class EasySwooleEvent implements Event
     public static function initialize()
     {
         // TODO: Implement initialize() method.
-        date_default_timezone_set("Asia/Shanghai");
+        date_default_timezone_set('Asia/Shanghai');
         require_once EASYSWOOLE_ROOT."/App/Utility/simple_dom_html.php";
 
         // 注入redis池和mysql池
@@ -42,7 +39,6 @@ class EasySwooleEvent implements Event
     public static function mainServerCreate(EventRegister $register)
     {
         // TODO: Implement mainServerCreate() method.
-
         // 清空数据
         $conf = Config::getInstance()->getConf('REDIS');
         $redis = new \Redis();
@@ -78,7 +74,7 @@ class EasySwooleEvent implements Event
                 });
 
                 // 定时任务
-                $timer = Timer::loop(1 * 1000, function () use (&$timer) {
+                $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
                     \Co::create(function () use (&$timer){
                         $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
                         $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
@@ -109,7 +105,7 @@ class EasySwooleEvent implements Event
         });
 
         // 开启热重启进程
-        Helper::addProcess('autoReload', Inotify::class);
+        ServerManager::getInstance()->getSwooleServer()->addProcess((new Inotify('autoReload', ['disableInotify' => false]))->getProcess());
     }
 
     public static function onRequest(Request $request, Response $response): bool
@@ -124,9 +120,18 @@ class EasySwooleEvent implements Event
         // TODO: Implement afterAction() method.
     }
 
+    public static function onMessage(\swoole_websocket_server  $server, \swoole_websocket_frame $frame):void
+    {
+
+    }
+
     public static function onReceive(\swoole_server $server, int $fd, int $reactor_id, string $data):void
     {
 
     }
 
+    public static function onPacket(\swoole_server $server, string $data, array $client_info):void
+    {
+
+    }
 }

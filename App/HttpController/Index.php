@@ -8,11 +8,9 @@
 
 namespace App\HttpController;
 
-
-use App\Model\Goods\GoodBean;
-use App\Model\Goods\Goods;
 use App\Task\Async;
 use EasySwoole\Curl\Request;
+use EasySwoole\EasySwoole\ServerManager;
 use EasySwoole\EasySwoole\Swoole\Task\TaskManager;
 use EasySwoole\Http\AbstractInterface\Controller;
 use EasySwoole\Spl\SplString;
@@ -82,6 +80,11 @@ class Index extends Controller
             echo 'task3'.PHP_EOL;
         };
         TaskManager::barrier($taskList);
+    }
+
+    function reload() {
+        ServerManager::getInstance()->getSwooleServer()->reload();
+        $this->response()->write('reload');
     }
 
 }
