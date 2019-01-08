@@ -16,7 +16,7 @@ composer install
 
 > php vendor/easyswoole/easyswoole/bin/easyswoole.php install
 
-tips: 安装生成文件时不要覆盖dev.env和EasySwooleEvent.php文件
+tips: 安装生成文件时不要覆盖dev.php和EasySwooleEvent.php文件
 
 > 启动项目
 
