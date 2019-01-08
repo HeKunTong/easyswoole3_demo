@@ -2,20 +2,20 @@
 
 > redis 连接信息
 
-```dotenv
-################ REDIS CONFIG ##################
-
-REDIS.host = 127.0.0.1
-REDIS.port = 6379
-REDIS.password =
-REDIS.POOL_MAX_NUM = 4
+```php
+'REDIS' => [
+    'host' => '127.0.0.1',
+    'port' => 6379,
+    'password' => '',
+    'POOL_MAX_NUM' => 10
+]
 ```
 
 > 注册redis连接池
   
 在EasySwooleEvent.php的initialize方法注册redis连接池
 ```php
- PoolManager::getInstance()->register(RedisPool::class, Config::getInstance()->getConf('REDIS.POOL_MAX_NUM'));
+PoolManager::getInstance()->register(RedisPool::class, Config::getInstance()->getConf('REDIS.POOL_MAX_NUM'));
 ```  
 
 > redis连接池类

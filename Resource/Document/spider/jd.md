@@ -1,5 +1,33 @@
 # 爬虫案例（京东苹果手机为例子）
 
+> 清空队列数据
+
+```php
+// 清空数据
+$conf = Config::getInstance()->getConf('REDIS');
+$redis = new \Redis();
+$redis->connect($conf['host'], $conf['port']);
+if (!empty($conf['auth'])) {
+    $redis->auth($conf['auth']);
+}
+$redis->del(Queue::$queue);
+```
+
+> 开启协程式任务采集任务
+
+
+```php
+\Co::create(function (){
+    $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
+    if ($redis) {
+        $jd = new Jd($redis);
+        $jd->run();
+    } else {
+        echo 'redis pool is empty'.PHP_EOL;
+    }
+});
+```
+
 > 采集京东苹果手机任务，也就是链接
 
 ```php

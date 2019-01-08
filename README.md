@@ -1,4 +1,4 @@
-# EasySwoole-3.x Demo
+# EasySwoole3 Demo
 
 运行项目
 
@@ -23,3 +23,15 @@ tips: 安装生成文件时不要覆盖dev.env和EasySwooleEvent.php文件
 ```
 php easyswoole start
 ```
+
+## 例子
+
+1. [京东爬虫](/Resource/Document/spider/jd.md)
+
+2. [连接池] 
+
+ > [redis连接池](/Resource/Document/pool/redis.md)
+ 
+ > [mysql连接池](/Resource/Document/pool/mysql.md)
+ 
+3. [REST路由](/Resource/Document/http/rest.md)

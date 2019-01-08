@@ -2,18 +2,18 @@
 
 > mysql 连接信息
 
-```dotenv
-################ MYSQL CONFIG ##################
-
-MYSQL.host = 192.168.75.1
-MYSQL.port = 3306
-MYSQL.user = root
-MYSQL.password = root
-MYSQL.database = cry
-MYSQL.timeout = 5
-MYSQL.charset = utf8mb4
-MYSQL.POOL_MAX_NUM = 2
-MYSQL.POOL_TIME_OUT = 0.1
+```php
+'MYSQL' => [
+    'host' => '192.168.75.1',
+    'port' => 3306,
+    'user' => 'root',
+    'password' => 'root',
+    'database' => 'cry',
+    'timeout' => 5,
+    'charset' => 'utf8mb4',
+    'POOL_MAX_NUM' => 10,
+    'POOL_TIME_OUT' => 0.1
+]
 ```
 
 > 注册mysql连接池

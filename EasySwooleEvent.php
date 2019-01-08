@@ -28,6 +28,7 @@ class EasySwooleEvent implements Event
     {
         // TODO: Implement initialize() method.
         date_default_timezone_set('Asia/Shanghai');
+
         require_once EASYSWOOLE_ROOT."/App/Utility/simple_dom_html.php";
 
         // 注入redis池和mysql池
@@ -52,55 +53,55 @@ class EasySwooleEvent implements Event
         $register->add(EventRegister::onWorkerStart, function (\swoole_server $server, $workerId) {
             if ($workerId === 0) {
                 // 定时器循环10次
-//                $count = 0;
-//                $timer = Timer::loop(10 * 1000, function () use(&$timer, &$count) {
-//                    if ($count == 10) {
-//                        unset($count);
-//                        Timer::clear($timer);
-//                    } else {
-//                        echo 'test'.PHP_EOL;
-//                        $count = $count + 1;
-//                        echo 'count'.$count.PHP_EOL;
-//                    }
-//                });
-                \Co::create(function (){
-                    $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
-                    if ($redis) {
-                        $jd = new Jd($redis);
-                        $jd->run();
+                $count = 0;
+                $timer = Timer::getInstance()->loop(10 * 1000, function () use(&$timer, &$count) {
+                    if ($count == 10) {
+                        unset($count);
+                        Timer::getInstance()->clear($timer);
                     } else {
-                        echo 'redis pool is empty'.PHP_EOL;
+                        echo 'test'.PHP_EOL;
+                        $count = $count + 1;
+                        echo 'count'.$count.PHP_EOL;
                     }
                 });
+//                \Co::create(function (){
+//                    $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
+//                    if ($redis) {
+//                        $jd = new Jd($redis);
+//                        $jd->run();
+//                    } else {
+//                        echo 'redis pool is empty'.PHP_EOL;
+//                    }
+//                });
 
                 // 定时任务
-                $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
-                    \Co::create(function () use (&$timer){
-                        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
-                        $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
-                        if ($db && $redis) {
-                            $queue = new Queue($redis);
-                            $goodTask = new JdGood($db);
-                            $task = $queue->rPop();
-                            if($task) {
-                                echo 'task-----'.$task.PHP_EOL;
-                                $goodTask->handle($task);
-                            } else {
-                                echo 'end-----'.PHP_EOL;
-                            }
-                            PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
-                            PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
-                        } else {
-                            if ($redis) {
-                                echo 'mysql pool is empty'.PHP_EOL;
-                                PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
-                            } else {
-                                echo 'redis pool is empty'.PHP_EOL;
-                                PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
-                            }
-                        }
-                    });
-                });
+//                $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
+//                    \Co::create(function () use (&$timer){
+//                        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
+//                        $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
+//                        if ($db && $redis) {
+//                            $queue = new Queue($redis);
+//                            $goodTask = new JdGood($db);
+//                            $task = $queue->rPop();
+//                            if($task) {
+//                                echo 'task-----'.$task.PHP_EOL;
+//                                $goodTask->handle($task);
+//                            } else {
+//                                echo 'end-----'.PHP_EOL;
+//                            }
+//                            PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
+//                            PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
+//                        } else {
+//                            if ($redis) {
+//                                echo 'mysql pool is empty'.PHP_EOL;
+//                                PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
+//                            } else {
+//                                echo 'redis pool is empty'.PHP_EOL;
+//                                PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
+//                            }
+//                        }
+//                    });
+//                });
             }
         });
 
@@ -119,19 +120,5 @@ class EasySwooleEvent implements Event
     {
         // TODO: Implement afterAction() method.
     }
-
-    public static function onMessage(\swoole_websocket_server  $server, \swoole_websocket_frame $frame):void
-    {
-
-    }
-
-    public static function onReceive(\swoole_server $server, int $fd, int $reactor_id, string $data):void
-    {
-
-    }
-
-    public static function onPacket(\swoole_server $server, string $data, array $client_info):void
-    {
-
-    }
 }
+
