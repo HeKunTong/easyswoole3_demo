@@ -73,7 +73,7 @@ class EasySwooleEvent implements Event
                     if ($redis) {
 //                        $jd = new Jd($redis);     // curl模式
 //                        $jd->run();
-                        $client = new JdClient($redis);     // 异步客户端
+                        $client = new JdClient($redis);     // 协程客户端
                         $client->run();
                     } else {
                         echo 'redis pool is empty'.PHP_EOL;
@@ -88,7 +88,7 @@ class EasySwooleEvent implements Event
                         if ($db && $redis) {
                             $queue = new Queue($redis);
                             // $goodTask = new JdGood($db);        // curl模式
-                            $goodTask = new JdGoodClient($db);        // 异步客户端
+                            $goodTask = new JdGoodClient($db);        // 协程客户端
                             $task = $queue->rPop();
                             if($task) {
                                 echo 'task-----'.$task.PHP_EOL;
