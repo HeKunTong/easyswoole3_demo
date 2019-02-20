@@ -18,7 +18,9 @@ return [
             'worker_num'=>8,
             'max_request'=>5000,
             'task_worker_num'=>8,
-            'task_max_request'=>1000
+            'task_max_request'=>1000,
+            'enable_static_handler' => true,
+            'document_root' => EASYSWOOLE_ROOT.'/Static'
         ]
     ],
     'TEMP_DIR'=>null,

@@ -30,6 +30,8 @@ $redis->del(Queue::$queue);
 });
 ```
 
+```备注```:使用协程客户端要在安装swoole时开启openssl选项。
+
 > 采集京东苹果手机任务
 
 curl模式:

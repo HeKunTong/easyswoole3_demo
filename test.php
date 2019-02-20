@@ -6,10 +6,10 @@
  * Time: 上午10:10
  */
 
-require './vendor/autoload.php';
-require_once  './App/Utility/simple_dom_html.php';
-use EasySwoole\Actor\DeveloperTool;
-
+//require './vendor/autoload.php';
+//require_once  './App/Utility/simple_dom_html.php';
+// use EasySwoole\Actor\DeveloperTool;
+//
 //go(function (){
 //    $tool = new DeveloperTool(\App\Actor\RoomActor::class,'001000001',[
 //        'startArg'=>'startArg....'
@@ -27,3 +27,24 @@ use EasySwoole\Actor\DeveloperTool;
 //    });
 //    $tool->run();
 //});
+
+//try{
+//    \EasySwoole\Component\Invoker::exec(function (){
+//        sleep(2);
+//    });
+//}catch (Throwable $throwable){
+//    echo $throwable->getMessage();
+//}
+
+//pcntl_signal(SIGALRM, function () {
+//    echo '定时到时' . PHP_EOL;
+//});
+//
+//pcntl_alarm(5);
+//$i=0;
+//while(1){
+//    echo $i.PHP_EOL;$i++;
+//    // pcntl_signal_dispatch();
+//    sleep(1);
+//}
+
