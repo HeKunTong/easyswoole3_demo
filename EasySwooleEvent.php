@@ -82,35 +82,35 @@ class EasySwooleEvent implements Event
 
                 // 定时任务
                 $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
-//                    \Co::create(function () use (&$timer){
-//                        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
-//                        $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
-//                        if ($db && $redis) {
-//                            $queue = new Queue($redis);
-//                            // $goodTask = new JdGood($db);        // curl模式
-//                            $goodTask = new JdGoodClient($db);        // 协程客户端
-//                            $task = $queue->rPop();
-//                            if($task) {
-//                                echo 'task-----'.$task.PHP_EOL;
-//                                $goodTask->handle($task);
-//                            } else {
-//                                if ($timer) {
-//                                    Timer::getInstance()->clear($timer);
-//                                }
-//                                echo 'end-----'.PHP_EOL;
-//                            }
-//                            PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
-//                            PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
-//                        } else {
-//                            if ($redis) {
-//                                echo 'mysql pool is empty'.PHP_EOL;
-//                                PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
-//                            } else {
-//                                echo 'redis pool is empty'.PHP_EOL;
-//                                PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
-//                            }
-//                        }
-//                    });
+                    \Co::create(function () use (&$timer){
+                        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
+                        $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
+                        if ($db && $redis) {
+                            $queue = new Queue($redis);
+                            // $goodTask = new JdGood($db);        // curl模式
+                            $goodTask = new JdGoodClient($db);        // 协程客户端
+                            $task = $queue->rPop();
+                            if($task) {
+                                echo 'task-----'.$task.PHP_EOL;
+                                $goodTask->handle($task);
+                            } else {
+                                if ($timer) {
+                                    Timer::getInstance()->clear($timer);
+                                }
+                                echo 'end-----'.PHP_EOL;
+                            }
+                            PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
+                            PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
+                        } else {
+                            if ($redis) {
+                                echo 'mysql pool is empty'.PHP_EOL;
+                                PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
+                            } else {
+                                echo 'redis pool is empty'.PHP_EOL;
+                                PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
+                            }
+                        }
+                    });
                 });
             }
         });

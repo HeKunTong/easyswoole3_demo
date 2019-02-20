@@ -6,7 +6,8 @@
         "easyswoole/easyswoole": "3.x-dev",
         "easyswoole/mysqli": "^1.0",
         "easyswoole/actor": "^1.0",
-        "easyswoole/http-client": "^1.0"
+        "easyswoole/http-client": "^1.0",
+        "easyswoole/curl": "^1.0"
     },
     "require-dev": {
         "eaglewu/swoole-ide-helper": "dev-master"
