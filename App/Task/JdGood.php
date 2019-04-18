@@ -11,19 +11,39 @@ namespace App\Task;
 
 use App\Model\Jd\JdBean;
 use App\Model\Jd\JdModel;
+use App\Queue\Queue;
+use App\Utility\Pool\MysqlPool;
 use App\Utility\Pool\MysqlPoolObject;
+use App\Utility\Pool\RedisPool;
 use EasySwoole\Curl\Request;
 
 class JdGood
 {
     protected $db;
 
-    function __construct(MysqlPoolObject $db)
+    function __construct()
     {
-        $this->db = $db;
+        $this->db = MysqlPool::defer();
     }
 
-    function handle($url)
+    function run() {
+        $redis = RedisPool::defer();
+        $queue = new Queue($redis);
+        $task = $queue->rPop();
+        if ($task) {
+            echo 'task-----'.$task.PHP_EOL;
+            try {
+                $this->handle($task);
+            } catch (\Exception $exception) {   // 失败重回队列任务
+                $queue->lPush($task);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private function handle($url)
     {
         $request = new Request($url);
         $body = $request->exec()->getBody();

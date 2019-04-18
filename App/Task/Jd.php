@@ -10,17 +10,11 @@ namespace App\Task;
 
 
 use App\Queue\Queue;
-use App\Utility\Pool\RedisObject;
+use App\Utility\Pool\RedisPool;
 use EasySwoole\Curl\Request;
 
 class Jd
 {
-    private $redis;
-
-    function __construct(RedisObject $redis)
-    {
-        $this->redis = $redis;
-    }
 
     public function run()
     {
@@ -47,7 +41,8 @@ class Jd
             $total = intval($skip->plaintext);
             $i = 2;
             echo $currentPage.PHP_EOL;
-            $queue = new Queue($this->redis);
+            $redis = RedisPool::defer();
+            $queue = new Queue($redis);
             $queue->lPush($currentPage);
             while($i <= $total) {
                 $page = str_replace('page=1', "page=$i", $currentPage);

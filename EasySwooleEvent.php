@@ -69,46 +69,23 @@ class EasySwooleEvent implements Event
 //                    }
 //                });
                 \Co::create(function (){
-                    $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
-                    if ($redis) {
-//                        $jd = new Jd($redis);     // curl模式
-//                        $jd->run();
-                        $client = new JdClient($redis);     // 协程客户端
-                        $client->run();
-                    } else {
-                        echo 'redis pool is empty'.PHP_EOL;
-                    }
+//                    $jd = new Jd();     // curl模式
+//                    $jd->run();
+                    $client = new JdClient();     // 协程客户端
+                    $client->run();
                 });
                 Timer::getInstance()->after(5 * 1000, function () {
                     // 定时任务
                     $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
                         \Co::create(function () use (&$timer){
-                            $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
-                            $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
-                            if ($db && $redis) {
-                                $queue = new Queue($redis);
-                                // $goodTask = new JdGood($db);        // curl模式
-                                $goodTask = new JdGoodClient($db);        // 协程客户端
-                                $task = $queue->rPop();
-                                if($task) {
-                                    echo 'task-----'.$task.PHP_EOL;
-                                    $goodTask->handle($task);
-                                } else {
-                                    if ($timer) {
-                                        Timer::getInstance()->clear($timer);
-                                    }
-                                    echo 'end-----'.PHP_EOL;
+                            $goodTask = new JdGoodClient(); // 协程客户端
+                            // $goodTask = new JdGood();    // curl模式
+                            $res = $goodTask->run();
+                            if (!$res) {
+                                if ($timer) {
+                                    Timer::getInstance()->clear($timer);
                                 }
-                                PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
-                                PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
-                            } else {
-                                if ($redis) {
-                                    echo 'mysql pool is empty'.PHP_EOL;
-                                    PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
-                                } else {
-                                    echo 'redis pool is empty'.PHP_EOL;
-                                    PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
-                                }
+                                echo 'end-----'.PHP_EOL;
                             }
                         });
                     });
