@@ -68,28 +68,28 @@ class EasySwooleEvent implements Event
 //                        echo 'count'.$count.PHP_EOL;
 //                    }
 //                });
-                \Co::create(function (){
-//                    $jd = new Jd();     // curl模式
-//                    $jd->run();
-                    $client = new JdClient();     // 协程客户端
-                    $client->run();
-                });
-                Timer::getInstance()->after(5 * 1000, function () {
-                    // 定时任务
-                    $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
-                        \Co::create(function () use (&$timer){
-                            $goodTask = new JdGoodClient(); // 协程客户端
-                            // $goodTask = new JdGood();    // curl模式
-                            $res = $goodTask->run();
-                            if (!$res) {
-                                if ($timer) {
-                                    Timer::getInstance()->clear($timer);
-                                }
-                                echo 'end-----'.PHP_EOL;
-                            }
-                        });
-                    });
-                });
+//                \Co::create(function (){
+////                    $jd = new Jd();     // curl模式
+////                    $jd->run();
+//                    $client = new JdClient();     // 协程客户端
+//                    $client->run();
+//                });
+//                Timer::getInstance()->after(5 * 1000, function () {
+//                    // 定时任务
+//                    $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
+//                        \Co::create(function () use (&$timer){
+//                            $goodTask = new JdGoodClient(); // 协程客户端
+//                            // $goodTask = new JdGood();    // curl模式
+//                            $res = $goodTask->run();
+//                            if (!$res) {
+//                                if ($timer) {
+//                                    Timer::getInstance()->clear($timer);
+//                                }
+//                                echo 'end-----'.PHP_EOL;
+//                            }
+//                        });
+//                    });
+//                });
             }
         });
 

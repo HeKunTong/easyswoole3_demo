@@ -11,9 +11,10 @@ namespace App\HttpController;
 
 use App\Model\User\UserModel;
 use App\Model\User\UserBean;
+use App\Utility\Pool\MysqlPool;
 use EasySwoole\EasySwoole\ServerManager;
 
-class Duck extends BaseWithDb
+class Duck extends Base
 {
 
     public function ip()
@@ -25,17 +26,18 @@ class Duck extends BaseWithDb
 
     public function users()
     {
-
-        $model = new UserModel($this->getDbConnection());
+        $db = MysqlPool::defer();
+        $model = new UserModel($db);
         $list = $model->getList();
         $this->writeJson(200, $list, '成功');
     }
 
     public function user()
     {
+        $db = MysqlPool::defer();
         $bean = new UserBean();
         $bean->setId(1);
-        $model = new UserModel($this->getDbConnection());
+        $model = new UserModel($db);
         $user = $model->getUser($bean);
         $this->writeJson(200, $user);
     }
