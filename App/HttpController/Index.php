@@ -57,15 +57,6 @@ class Index extends Controller
     }
 
     /**
-     * 异步任务
-     */
-    function async() {
-        TaskManager::async(new Async('async'));
-        // TaskManager::sync(new Async('async'));
-        $this->response()->write('async...');
-    }
-
-    /**
      * 并发任务
      */
     function barrier() {

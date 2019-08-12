@@ -13,7 +13,6 @@ use App\Model\Jd\JdBean;
 use App\Model\Jd\JdModel;
 use App\Queue\Queue;
 use App\Utility\Pool\MysqlPool;
-use App\Utility\Pool\MysqlPoolObject;
 use App\Utility\Pool\RedisPool;
 use EasySwoole\HttpClient\HttpClient;
 
@@ -45,10 +44,9 @@ class JdGoodClient
 
     private function handle($url)
     {
-        $client = new HttpClient();
-        $client->setUrl($url);
+        $client = new HttpClient($url);
         $client->setTimeout(3);
-        $ret = $client->exec();
+        $ret = $client->get();
         if ($ret->getErrMsg()) {
             throw new \Exception($ret->getErrMsg());
         } else {
@@ -85,10 +83,9 @@ class JdGoodClient
         ];
         $url = $url.'?'.http_build_query($params);
 
-        $client = new HttpClient();
-        $client->setUrl($url);
+        $client = new HttpClient($url);
         $client->setTimeout(3);
-        $ret = $client->exec();
+        $ret = $client->get();
         if ($ret->getErrMsg()) {
             throw new \Exception($ret->getErrMsg());
         } else {

@@ -10,7 +10,6 @@ namespace App\Task;
 
 
 use App\Queue\Queue;
-use App\Utility\Pool\RedisObject;
 use App\Utility\Pool\RedisPool;
 use EasySwoole\HttpClient\HttpClient;
 
@@ -29,11 +28,10 @@ class JdClient
         ];
         $url = $url.'?'.http_build_query($params);
         echo $url.PHP_EOL;
-        $client = new HttpClient();
-        $client->setUrl($url);
+        $client = new HttpClient($url);
         $client->setTimeout(5);
         $client->setHeader('Referer', 'https://list.jd.com/list.html?cat=9987,653,655');
-        $ret = $client->exec();
+        $ret = $client->get();
         if ($ret->getErrMsg()) {
             var_dump($ret->getErrCode());
             var_dump($ret->getErrMsg());

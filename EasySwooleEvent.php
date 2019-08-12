@@ -8,16 +8,12 @@
 
 namespace EasySwoole\EasySwoole;
 
-use App\Actor\RoomActor;
 use App\Process\Inotify;
 use App\Queue\Queue;
-use App\Task\Jd;
 use App\Task\JdClient;
-use App\Task\JdGood;
 use App\Task\JdGoodClient;
 use App\Utility\Pool\MysqlPool;
 use App\Utility\Pool\RedisPool;
-use EasySwoole\Actor\Actor;
 use EasySwoole\Component\Pool\PoolManager;
 use EasySwoole\Component\Timer;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
@@ -56,49 +52,31 @@ class EasySwooleEvent implements Event
         // TODO: Implement mainServerCreate() method.
         $register->add(EventRegister::onWorkerStart, function (\swoole_server $server, $workerId) {
             if ($workerId === 0) {
-                // 定时器循环10次
-//                $count = 0;
-//                $timer = Timer::getInstance()->loop(10 * 1000, function () use(&$timer, &$count) {
-//                    if ($count == 10) {
-//                        unset($count);
-//                        Timer::getInstance()->clear($timer);
-//                    } else {
-//                        echo 'test'.PHP_EOL;
-//                        $count = $count + 1;
-//                        echo 'count'.$count.PHP_EOL;
-//                    }
-//                });
-//                \Co::create(function (){
-////                    $jd = new Jd();     // curl模式
-////                    $jd->run();
-//                    $client = new JdClient();     // 协程客户端
-//                    $client->run();
-//                });
-//                Timer::getInstance()->after(5 * 1000, function () {
-//                    // 定时任务
-//                    $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
-//                        \Co::create(function () use (&$timer){
-//                            $goodTask = new JdGoodClient(); // 协程客户端
-//                            // $goodTask = new JdGood();    // curl模式
-//                            $res = $goodTask->run();
-//                            if (!$res) {
-//                                if ($timer) {
-//                                    Timer::getInstance()->clear($timer);
-//                                }
-//                                echo 'end-----'.PHP_EOL;
-//                            }
-//                        });
-//                    });
-//                });
+                \Co::create(function (){
+                    $client = new JdClient();     // 协程客户端
+                    $client->run();
+                });
+                Timer::getInstance()->after(5 * 1000, function () {
+                    // 定时任务
+                    $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
+                        \Co::create(function () use (&$timer){
+                            $goodTask = new JdGoodClient(); // 协程客户端
+                            $res = $goodTask->run();
+                            if (!$res) {
+                                if ($timer) {
+                                    Timer::getInstance()->clear($timer);
+                                }
+                                echo 'end-----'.PHP_EOL;
+                            }
+                        });
+                    });
+                });
             }
         });
 
         // 开启热重启进程
         ServerManager::getInstance()->getSwooleServer()->addProcess((new Inotify('autoReload', ['disableInotify' => false]))->getProcess());
 
-        Actor::getInstance()->register(RoomActor::class)->setActorProcessNum(3)//设置保存actor的进程数目
-        ->setActorName('RoomActor')//设置Actor的名称，注意一定要注册，且不能重复
-        ->setMaxActorNum(1000);//设置当前actor中最大的actor数目
     }
 
     public static function onRequest(Request $request, Response $response): bool

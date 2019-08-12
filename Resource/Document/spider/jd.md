@@ -18,79 +18,14 @@ $redis->del(Queue::$queue);
 
 ```php
 \Co::create(function (){
-    $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
-    if ($redis) {
-//      $jd = new Jd($redis);     // curl模式
-//      $jd->run();
-        $client = new JdClient($redis);     // 协程客户端
-        $client->run();
-    } else {
-        echo 'redis pool is empty'.PHP_EOL;
-    }
+    $client = new JdClient();     // 协程客户端
+    $client->run();
 });
 ```
 
 ```备注```:使用协程客户端要在安装swoole时开启openssl选项。
 
 > 采集京东苹果手机任务
-
-curl模式:
-
-```php
-<?php
-/**
- * Created by PhpStorm.
- * User: root
- * Date: 18-10-10
- * Time: 下午1:49
- */
-
-namespace App\Task;
-
-
-use App\Queue\Queue;
-use EasySwoole\Curl\Request;
-
-class Jd
-{
-
-    public function run()
-    {
-        // TODO: Implement run() method.
-        $url = 'https://list.jd.com/list.html';
-        $params = [
-            'cat' => '9987,653,655',
-            'ev' => 'exbrand_14026',
-            'sort' => 'sort_rank_asc',
-            'trans' => 1,
-            'JL' => '3_品牌_Apple'
-        ];
-        $url = $url.'?'.http_build_query($params);
-        echo $url.PHP_EOL;
-        $request = new Request($url);
-        $request->setUserOpt([CURLOPT_REFERER => 'https://list.jd.com/list.html?cat=9987,653,655']);
-        $body = $request->exec()->getBody();
-        $html = new \simple_html_dom();
-        $html->load($body);
-        $curr = $html->find('.p-num a.curr', 0);
-        $skip = $html->find('.p-skip b', 0);
-        if (!empty($curr) && !empty($skip)) {
-            $currentPage = 'https://list.jd.com'.$curr->href;
-            $total = intval($skip->plaintext);
-            $i = 2;
-            echo $currentPage.PHP_EOL;
-            $queue = new Queue();
-            $queue->lPush($currentPage);
-            while($i <= $total) {
-                $page = str_replace('page=1', "page=$i", $currentPage);
-                echo $page.PHP_EOL;
-                $queue->lPush($page);
-                $i++;
-            }
-        }
-    }
-}
-```
 
 协程客户端模式:
 
@@ -107,18 +42,11 @@ namespace App\Task;
 
 
 use App\Queue\Queue;
-use App\Utility\Pool\RedisObject;
+use App\Utility\Pool\RedisPool;
 use EasySwoole\HttpClient\HttpClient;
 
 class JdClient
 {
-    private $redis;
-
-    function __construct(RedisObject $redis)
-    {
-        $this->redis = $redis;
-    }
-
     public function run()
     {
         // TODO: Implement run() method.
@@ -132,27 +60,33 @@ class JdClient
         ];
         $url = $url.'?'.http_build_query($params);
         echo $url.PHP_EOL;
-        $client = new HttpClient();
-        $client->setUrl($url);
-        $client->setTimeout(3);
+        $client = new HttpClient($url);
+        $client->setTimeout(5);
         $client->setHeader('Referer', 'https://list.jd.com/list.html?cat=9987,653,655');
-        $body = $client->exec()->getBody();
-        $html = new \simple_html_dom();
-        $html->load($body);
-        $curr = $html->find('.p-num a.curr', 0);
-        $skip = $html->find('.p-skip b', 0);
-        if (!empty($curr) && !empty($skip)) {
-            $currentPage = 'https://list.jd.com'.$curr->href;
-            $total = intval($skip->plaintext);
-            $i = 2;
-            echo $currentPage.PHP_EOL;
-            $queue = new Queue($this->redis);
-            $queue->lPush($currentPage);
-            while($i <= $total) {
-                $page = str_replace('page=1', "page=$i", $currentPage);
-                echo $page.PHP_EOL;
-                $queue->lPush($page);
-                $i++;
+        $ret = $client->get();
+        if ($ret->getErrMsg()) {
+            var_dump($ret->getErrCode());
+            var_dump($ret->getErrMsg());
+        } else {
+            $body = $ret->getBody();
+            $html = new \simple_html_dom();
+            $html->load($body);
+            $curr = $html->find('.p-num a.curr', 0);
+            $skip = $html->find('.p-skip b', 0);
+            if (!empty($curr) && !empty($skip)) {
+                $currentPage = 'https://list.jd.com'.$curr->href;
+                $total = intval($skip->plaintext);
+                $i = 2;
+                echo $currentPage.PHP_EOL;
+                $redis = RedisPool::defer();
+                $queue = new Queue($redis);
+                $queue->lPush($currentPage);
+                while($i <= $total) {
+                    $page = str_replace('page=1', "page=$i", $currentPage);
+                    echo $page.PHP_EOL;
+                    $queue->lPush($page);
+                    $i++;
+                }
             }
         }
     }
@@ -164,130 +98,24 @@ class JdClient
 
 ```php
 // 定时任务
-$timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
-    \Co::create(function () use (&$timer){
-        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
-        $redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
-        if ($db && $redis) {
-            $queue = new Queue($redis);
-            // $goodTask = new JdGood($db);        // curl模式
-            $goodTask = new JdGoodClient($db);        // 协程客户端
-            $task = $queue->rPop();
-            if($task) {
-                echo 'task-----'.$task.PHP_EOL;
-                $goodTask->handle($task);
-            } else {
+Timer::getInstance()->after(5 * 1000, function () {
+    // 定时任务
+    $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
+        \Co::create(function () use (&$timer){
+            $goodTask = new JdGoodClient(); // 协程客户端
+            $res = $goodTask->run();
+            if (!$res) {
                 if ($timer) {
                     Timer::getInstance()->clear($timer);
                 }
                 echo 'end-----'.PHP_EOL;
             }
-            PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
-            PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
-        } else {
-            if ($redis) {
-                echo 'mysql pool is empty'.PHP_EOL;
-                PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);
-            } else {
-                echo 'redis pool is empty'.PHP_EOL;
-                PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);
-            }
-        }
+        });
     });
 });
 ```
 
 > 采集任务处理逻辑
-
-curl模式:
-
-```php
-<?php
-/**
- * Created by PhpStorm.
- * User: root
- * Date: 18-10-10
- * Time: 下午3:33
- */
-
-namespace App\Task;
-
-
-use App\Model\Jd\JdBean;
-use App\Model\Jd\JdModel;
-use App\Utility\Pool\MysqlPool;
-use EasySwoole\Component\Pool\PoolManager;
-use EasySwoole\Curl\Request;
-
-class JdGood
-{
-    protected $db;
-
-    function __construct()
-    {
-        $db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj();
-        if ($db) {
-            $this->db = $db;
-        } else {
-            throw new \Exception('mysql pool is empty');
-        }
-    }
-
-    function handle($url)
-    {
-        $request = new Request($url);
-        $body = $request->exec()->getBody();
-        $html = new \simple_html_dom();
-        $html->load($body);
-        $list = $html->find('ul.gl-warp', 0);
-        $len = count($list->find('.gl-item'));
-        $skus = [];
-        for ($i = 0; $i < $len; $i++) {
-            $item = $list->find('.gl-item', $i);
-            $sku = $item->find('.j-sku-item', 0)->getAttribute('data-sku');
-            $skus[] = 'J_'.$sku;
-            $name = trim($item->find('.p-name em', 0)->plaintext);
-            $shop = $item->find('.p-shop', 0)->getAttribute('data-shop_name');
-            $data = [
-                'name' => $name,
-                'shop' => $shop,
-                'sku' => $sku,
-            ];
-            $bean = new JdBean($data);
-            $model = new JdModel($this->db);
-            $model->insert($bean);
-        }
-        $this->getPrice($skus);
-    }
-
-    private function getPrice($skus)
-    {
-        $url = 'https://p.3.cn/prices/mgets';
-        $params = [
-            'skuIds' => implode(',', $skus)
-        ];
-        $url = $url.'?'.http_build_query($params);
-        $request = new Request($url);
-
-        $result = json_decode($request->exec()->getBody(), true);
-
-        foreach ($result as $item) {
-            $sku = substr($item['id'], 2);
-            $price = floatval($item['p']) * 100;
-            $bean = new JdBean();
-            $bean->setSku($sku);
-            $model = new JdModel($this->db);
-            $model->update($bean, $price);
-        }
-    }
-
-    function __destruct()
-    {
-        // TODO: Implement __destruct() method.
-        PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($this->db);
-    }
-}    
-``` 
 
 协程客户端:
 
@@ -305,45 +133,68 @@ namespace App\Task;
 
 use App\Model\Jd\JdBean;
 use App\Model\Jd\JdModel;
-use App\Utility\Pool\MysqlPoolObject;
+use App\Queue\Queue;
+use App\Utility\Pool\MysqlPool;
+use App\Utility\Pool\RedisPool;
 use EasySwoole\HttpClient\HttpClient;
 
 class JdGoodClient
 {
-    protected $db;
+    private $db;
 
-    function __construct(MysqlPoolObject $db)
+    function __construct()
     {
-        $this->db = $db;
+        $this->db = MysqlPool::defer();
     }
 
-    function handle($url)
-    {
-        $client = new HttpClient();
-        $client->setUrl($url);
-        $client->setTimeout(3);
-        $body = $client->exec()->getBody();
-        $html = new \simple_html_dom();
-        $html->load($body);
-        $list = $html->find('ul.gl-warp', 0);
-        $len = count($list->find('.gl-item'));
-        $skus = [];
-        for ($i = 0; $i < $len; $i++) {
-            $item = $list->find('.gl-item', $i);
-            $sku = $item->find('.j-sku-item', 0)->getAttribute('data-sku');
-            $skus[] = 'J_'.$sku;
-            $name = trim($item->find('.p-name em', 0)->plaintext);
-            $shop = $item->find('.p-shop', 0)->getAttribute('data-shop_name');
-            $data = [
-                'name' => $name,
-                'shop' => $shop,
-                'sku' => $sku,
-            ];
-            $bean = new JdBean($data);
-            $model = new JdModel($this->db);
-            $model->insert($bean);
+    function run() {
+        $redis = RedisPool::defer();
+        $queue = new Queue($redis);
+        $task = $queue->rPop();
+        if ($task) {
+            echo 'task-----'.$task.PHP_EOL;
+            try {
+                $this->handle($task);
+            } catch (\Exception $exception) {   // 失败重回队列任务
+                $queue->lPush($task);
+            }
+            return true;
+        } else {
+            return false;
         }
-        $this->getPrice($skus);
+    }
+
+    private function handle($url)
+    {
+        $client = new HttpClient($url);
+        $client->setTimeout(3);
+        $ret = $client->get();
+        if ($ret->getErrMsg()) {
+            throw new \Exception($ret->getErrMsg());
+        } else {
+            $body = $ret->getBody();
+            $html = new \simple_html_dom();
+            $html->load($body);
+            $list = $html->find('ul.gl-warp', 0);
+            $len = count($list->find('.gl-item'));
+            $skus = [];
+            for ($i = 0; $i < $len; $i++) {
+                $item = $list->find('.gl-item', $i);
+                $sku = $item->find('.j-sku-item', 0)->getAttribute('data-sku');
+                $skus[] = 'J_'.$sku;
+                $name = trim($item->find('.p-name em', 0)->plaintext);
+                $shop = $item->find('.p-shop', 0)->getAttribute('data-shop_name');
+                $data = [
+                    'name' => $name,
+                    'shop' => $shop,
+                    'sku' => $sku,
+                ];
+                $bean = new JdBean($data);
+                $model = new JdModel($this->db);
+                $model->insert($bean);
+            }
+            $this->getPrice($skus);
+        }
     }
 
     private function getPrice($skus)
@@ -354,19 +205,23 @@ class JdGoodClient
         ];
         $url = $url.'?'.http_build_query($params);
 
-        $client = new HttpClient();
-        $client->setUrl($url);
+        $client = new HttpClient($url);
         $client->setTimeout(3);
-        $body = $client->exec()->getBody();
-        $result = json_decode($body, true);
+        $ret = $client->get();
+        if ($ret->getErrMsg()) {
+            throw new \Exception($ret->getErrMsg());
+        } else {
+            $body = $ret->getBody();
+            $result = json_decode($body, true);
 
-        foreach ($result as $item) {
-            $sku = substr($item['id'], 2);
-            $price = floatval($item['p']) * 100;
-            $bean = new JdBean();
-            $bean->setSku($sku);
-            $model = new JdModel($this->db);
-            $model->update($bean, $price);
+            foreach ($result as $item) {
+                $sku = substr($item['id'], 2);
+                $price = floatval($item['p']) * 100;
+                $bean = new JdBean();
+                $bean->setSku($sku);
+                $model = new JdModel($this->db);
+                $model->update($bean, $price);
+            }
         }
     }
 }
@@ -387,5 +242,5 @@ CREATE TABLE `jd` (
   `price` int(11) DEFAULT NULL,
   `shop` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=806 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 ```

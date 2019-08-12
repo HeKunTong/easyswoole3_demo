@@ -15,12 +15,13 @@ return [
         'SOCK_TYPE'=>SWOOLE_TCP,
         'RUN_MODEL'=>SWOOLE_PROCESS,
         'SETTING'=>[
-            'worker_num'=>8,
-            'max_request'=>5000,
-            'task_worker_num'=>8,
-            'task_max_request'=>1000,
+            'worker_num' => 8,
+            'task_worker_num' => 8,
+            'reload_async' => true,
+            'task_enable_coroutine' => true,
+            'max_wait_time'=>3,
+            'document_root'         => EASYSWOOLE_ROOT . '/Static',
             'enable_static_handler' => true,
-            'document_root' => EASYSWOOLE_ROOT.'/Static'
         ]
     ],
     'TEMP_DIR'=>null,
