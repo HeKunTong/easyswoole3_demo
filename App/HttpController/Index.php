@@ -8,10 +8,9 @@
 
 namespace App\HttpController;
 
-use App\Task\Async;
 use EasySwoole\Curl\Request;
 use EasySwoole\EasySwoole\ServerManager;
-use EasySwoole\EasySwoole\Swoole\Task\TaskManager;
+use EasySwoole\EasySwoole\Task\TaskManager;
 use EasySwoole\Http\AbstractInterface\Controller;
 use EasySwoole\Spl\SplString;
 
@@ -57,20 +56,19 @@ class Index extends Controller
     }
 
     /**
-     * 并发任务
+     * 投递闭包任务
      */
-    function barrier() {
-        $taskList[] = function () {
-            echo 'task1'.PHP_EOL;
-        };
-        $taskList[] = function () {
-            sleep(1);
-            echo 'task2'.PHP_EOL;
-        };
-        $taskList[] = function () {
-            echo 'task3'.PHP_EOL;
-        };
-        TaskManager::barrier($taskList);
+    function async() {
+        TaskManager::getInstance()->async(function() {
+            try {
+                \Co::sleep(2);
+                var_dump('async');
+            } catch (\Throwable $throwable) {
+                var_dump('throwable');
+            }
+
+        });
+        $this->response()->write('async');
     }
 
     function reload() {

@@ -29,8 +29,6 @@ class EasySwooleEvent implements Event
         // TODO: Implement initialize() method.
         date_default_timezone_set('Asia/Shanghai');
 
-        require_once EASYSWOOLE_ROOT."/App/Utility/simple_dom_html.php";
-
         // 注入redis池和mysql池
 
         PoolManager::getInstance()->register(RedisPool::class, Config::getInstance()->getConf('REDIS.POOL_MAX_NUM'));
@@ -75,7 +73,7 @@ class EasySwooleEvent implements Event
         });
 
         // 开启热重启进程
-        ServerManager::getInstance()->getSwooleServer()->addProcess((new Inotify('autoReload', ['disableInotify' => false]))->getProcess());
+        // ServerManager::getInstance()->getSwooleServer()->addProcess((new Inotify('autoReload', ['disableInotify' => false]))->getProcess());
 
     }
 

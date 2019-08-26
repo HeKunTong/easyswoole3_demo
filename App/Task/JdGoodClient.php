@@ -30,10 +30,12 @@ class JdGoodClient
         $queue = new Queue($redis);
         $task = $queue->rPop();
         if ($task) {
-            echo 'task-----'.$task.PHP_EOL;
             try {
+                echo 'task-----'.$task.PHP_EOL;
                 $this->handle($task);
             } catch (\Exception $exception) {   // 失败重回队列任务
+                echo 'task-----'.$task.PHP_EOL;
+                echo 'fail-----'.$task.PHP_EOL;
                 $queue->lPush($task);
             }
             return true;
