@@ -13,6 +13,7 @@ use EasySwoole\EasySwoole\ServerManager;
 use EasySwoole\EasySwoole\Task\TaskManager;
 use EasySwoole\Http\AbstractInterface\Controller;
 use EasySwoole\Spl\SplString;
+use EasySwoole\Template\Render;
 
 class Index extends Controller
 {
@@ -70,6 +71,15 @@ class Index extends Controller
         });
         $this->response()->write('async');
     }
+
+    function template() {
+        $html = Render::getInstance()->render('index', [
+            'name'=> 'easyswoole'
+        ]);
+        $this->response()->withHeader('Content-type', 'text/html');
+        $this->response()->write($html);
+    }
+
 
     function reload() {
         ServerManager::getInstance()->getSwooleServer()->reload();

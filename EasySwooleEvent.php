@@ -12,6 +12,7 @@ use App\Process\Inotify;
 use App\Queue\Queue;
 use App\Task\JdClient;
 use App\Task\JdGoodClient;
+use App\Template;
 use App\Utility\Pool\MysqlPool;
 use App\Utility\Pool\RedisPool;
 use EasySwoole\Component\Pool\PoolManager;
@@ -20,6 +21,7 @@ use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\EasySwoole\AbstractInterface\Event;
 use EasySwoole\Http\Request;
 use EasySwoole\Http\Response;
+use EasySwoole\Template\Render;
 
 class EasySwooleEvent implements Event
 {
@@ -71,6 +73,9 @@ class EasySwooleEvent implements Event
                 });
             }
         });
+
+        Render::getInstance()->getConfig()->setRender(new Template());
+        Render::getInstance()->attachServer(ServerManager::getInstance()->getSwooleServer());
 
         // 开启热重启进程
         // ServerManager::getInstance()->getSwooleServer()->addProcess((new Inotify('autoReload', ['disableInotify' => false]))->getProcess());
