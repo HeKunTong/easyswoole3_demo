@@ -84,7 +84,6 @@ class EasySwooleEvent implements Event
     public static function onRequest(Request $request, Response $response): bool
     {
         // TODO: Implement onRequest() method.
-        $response->withHeader('Content-type','application/json;charset=utf-8');
         return true;
     }
 

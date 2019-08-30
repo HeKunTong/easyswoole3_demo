@@ -76,7 +76,6 @@ class Index extends Controller
         $html = Render::getInstance()->render('index', [
             'name'=> 'easyswoole'
         ]);
-        $this->response()->withHeader('Content-type', 'text/html');
         $this->response()->write($html);
     }
 
