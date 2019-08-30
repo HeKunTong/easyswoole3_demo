@@ -26,12 +26,14 @@ php easyswoole start
 
 ## 例子
 
-- [京东爬虫](/Resource/Document/spider/jd.md)
+- [京东爬虫](/Document/spider/jd.md)
 
 - [连接池] 
 
-  [redis连接池](/Resource/Document/pool/redis.md)
+  [redis连接池](/Document/pool/redis.md)
  
-  [mysql连接池](/Resource/Document/pool/mysql.md)
+  [mysql连接池](/Document/pool/mysql.md)
  
-- [REST路由](/Resource/Document/http/rest.md)
+- [REST路由](/Document/http/rest.md)
+
+- [think-template模板引擎](/Document/http/template.md)
