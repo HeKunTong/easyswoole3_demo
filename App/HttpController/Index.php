@@ -53,6 +53,7 @@ class Index extends Controller
         $content = $string->regex('/\{.*\}/');
         $json = json_decode($content, true);
         $lyric = $json['lyric'];
+        $this->response()->withHeader("content-type", "application/json;charset=UTF-8");
         $this->response()->write(html_entity_decode($lyric));
     }
 
