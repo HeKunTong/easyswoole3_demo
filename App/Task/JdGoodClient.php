@@ -12,9 +12,8 @@ namespace App\Task;
 use App\Model\Jd\JdBean;
 use App\Model\Jd\JdModel;
 use App\Queue\Queue;
-use App\Utility\Pool\MysqlPool;
-use App\Utility\Pool\RedisPool;
 use EasySwoole\HttpClient\HttpClient;
+use EasySwoole\Pool\Manager;
 
 class JdGoodClient
 {
@@ -22,11 +21,11 @@ class JdGoodClient
 
     function __construct()
     {
-        $this->db = MysqlPool::defer();
+        $this->db = Manager::getInstance()->get('mysql')->defer();
     }
 
     function run() {
-        $redis = RedisPool::defer();
+        $redis = Manager::getInstance()->get('redis')->defer();
         $queue = new Queue($redis);
         $task = $queue->rPop();
         if ($task) {

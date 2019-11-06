@@ -9,9 +9,7 @@
 namespace App\Model;
 
 
-use App\Utility\Pool\MysqlPool;
 use App\Utility\Pool\MysqlPoolObject;
-use EasySwoole\Component\Pool\PoolManager;
 
 class BaseModel
 {

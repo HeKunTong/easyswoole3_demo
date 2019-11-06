@@ -10,8 +10,8 @@ namespace App\Task;
 
 
 use App\Queue\Queue;
-use App\Utility\Pool\RedisPool;
 use EasySwoole\HttpClient\HttpClient;
+use EasySwoole\Pool\Manager;
 
 class JdClient
 {
@@ -46,7 +46,7 @@ class JdClient
                 $total = intval($skip->plaintext);
                 $i = 2;
                 echo $currentPage.PHP_EOL;
-                $redis = RedisPool::defer();
+                $redis = Manager::getInstance()->get('redis')->defer();
                 $queue = new Queue($redis);
                 $queue->lPush($currentPage);
                 while($i <= $total) {

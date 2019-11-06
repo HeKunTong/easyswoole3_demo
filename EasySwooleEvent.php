@@ -15,12 +15,12 @@ use App\Task\JdGoodClient;
 use App\Template;
 use App\Utility\Pool\MysqlPool;
 use App\Utility\Pool\RedisPool;
-use EasySwoole\Component\Pool\PoolManager;
 use EasySwoole\Component\Timer;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\EasySwoole\AbstractInterface\Event;
 use EasySwoole\Http\Request;
 use EasySwoole\Http\Response;
+use EasySwoole\Pool\Manager;
 use EasySwoole\Template\Render;
 
 class EasySwooleEvent implements Event
@@ -33,8 +33,8 @@ class EasySwooleEvent implements Event
 
         // 注入redis池和mysql池
 
-        PoolManager::getInstance()->register(RedisPool::class, Config::getInstance()->getConf('REDIS.POOL_MAX_NUM'));
-        PoolManager::getInstance()->register(MysqlPool::class, Config::getInstance()->getConf('MYSQL.POOL_MAX_NUM'));
+        Manager::getInstance()->register(new RedisPool(new \EasySwoole\Pool\Config()), 'redis');
+        Manager::getInstance()->register(new MysqlPool(new \EasySwoole\Pool\Config()), 'mysql');
     }
 
     public static function mainServerCreate(EventRegister $register)

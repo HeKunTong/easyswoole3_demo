@@ -8,8 +8,8 @@
 
 namespace App\Utility\Pool;
 
-use EasySwoole\Component\Pool\AbstractPool;
 use EasySwoole\EasySwoole\Config;
+use EasySwoole\Pool\AbstractPool;
 
 class RedisPool extends AbstractPool
 {

@@ -9,7 +9,8 @@
         "easyswoole/curl": "^1.0",
         "easyswoole/swoole-ide-helper": "^1.3",
         "easyswoole/template": "^1.0",
-        "topthink/think-template": "^2.0"
+        "topthink/think-template": "^2.0",
+        "easyswoole/pool": "^1.0"
     },
     "require-dev": {
     },

@@ -8,11 +8,10 @@
 
 namespace App\Utility\Pool;
 
-
-use EasySwoole\Component\Pool\PoolObjectInterface;
 use EasySwoole\Mysqli\Mysqli;
+use EasySwoole\Pool\ObjectInterface;
 
-class MysqlPoolObject extends Mysqli implements PoolObjectInterface
+class MysqlPoolObject extends Mysqli implements ObjectInterface
 {
 
     function gc()

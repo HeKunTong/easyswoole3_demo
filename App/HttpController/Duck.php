@@ -13,6 +13,7 @@ use App\Model\User\UserModel;
 use App\Model\User\UserBean;
 use App\Utility\Pool\MysqlPool;
 use EasySwoole\EasySwoole\ServerManager;
+use EasySwoole\Pool\Manager;
 
 class Duck extends Base
 {
@@ -26,7 +27,7 @@ class Duck extends Base
 
     public function users()
     {
-        $db = MysqlPool::defer();
+        $db = Manager::getInstance()->get('mysql')->defer();
         $model = new UserModel($db);
         $list = $model->getList();
         $this->writeJson(200, $list, '成功');
@@ -34,7 +35,7 @@ class Duck extends Base
 
     public function user()
     {
-        $db = MysqlPool::defer();
+        $db = Manager::getInstance()->get('mysql')->defer();
         $bean = new UserBean();
         $bean->setId(1);
         $model = new UserModel($db);

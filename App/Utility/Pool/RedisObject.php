@@ -9,10 +9,10 @@
 namespace App\Utility\Pool;
 
 
-use EasySwoole\Component\Pool\PoolObjectInterface;
+use EasySwoole\Pool\ObjectInterface;
 use Swoole\Coroutine\Redis;
 
-class RedisObject extends Redis implements PoolObjectInterface
+class RedisObject extends Redis implements ObjectInterface
 {
     function gc()
     {

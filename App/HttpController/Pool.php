@@ -8,9 +8,8 @@
 
 namespace App\HttpController;
 
-
-use App\Utility\Pool\RedisPool;
 use EasySwoole\Http\AbstractInterface\Controller;
+use EasySwoole\Pool\Manager;
 
 class Pool extends Controller
 {
@@ -18,7 +17,7 @@ class Pool extends Controller
     function index()
     {
         // TODO: Implement index() method.
-        $redis = RedisPool::defer();
+        $redis = Manager::getInstance()->get('redis')->defer();
         $redis->set('name', 'blank');
         $name = $redis->get('name');
         $this->response()->write($name);
