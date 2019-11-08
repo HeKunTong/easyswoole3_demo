@@ -36,14 +36,11 @@ return [
         'database' => 'cry',
         'timeout' => 5,
         'charset' => 'utf8mb4',
-        'POOL_MAX_NUM' => 10,
-        'POOL_TIME_OUT' => 0.1
     ],
 
     'REDIS' => [
         'host' => '127.0.0.1',
         'port' => 6379,
         'password' => '',
-        'POOL_MAX_NUM' => 10
     ]
 ];

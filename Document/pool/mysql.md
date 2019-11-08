@@ -11,8 +11,6 @@
     'database' => 'cry',
     'timeout' => 5,
     'charset' => 'utf8mb4',
-    'POOL_MAX_NUM' => 10,
-    'POOL_TIME_OUT' => 0.1
 ]
 ```
 
@@ -20,7 +18,7 @@
   
 在EasySwooleEvent.php的initialize方法注册mysql连接池
 ```php
-PoolManager::getInstance()->register(MysqlPool::class, Config::getInstance()->getConf('MYSQL.POOL_MAX_NUM'));
+Manager::getInstance()->register(new MysqlPool(new \EasySwoole\Pool\Config()), 'mysql');
 ```  
 
 > mysql连接池类
@@ -37,8 +35,8 @@ PoolManager::getInstance()->register(MysqlPool::class, Config::getInstance()->ge
 namespace App\Utility\Pool;
 
 
-use EasySwoole\Component\Pool\AbstractPool;
 use EasySwoole\EasySwoole\Config;
+use EasySwoole\Pool\AbstractPool;
 
 class MysqlPool extends AbstractPool
 {
@@ -66,11 +64,10 @@ class MysqlPool extends AbstractPool
 
 namespace App\Utility\Pool;
 
-
-use EasySwoole\Component\Pool\PoolObjectInterface;
 use EasySwoole\Mysqli\Mysqli;
+use EasySwoole\Pool\ObjectInterface;
 
-class MysqlPoolObject extends Mysqli implements PoolObjectInterface
+class MysqlPoolObject extends Mysqli implements ObjectInterface
 {
 
     function gc()
@@ -97,11 +94,11 @@ class MysqlPoolObject extends Mysqli implements PoolObjectInterface
 > 从连接池获取redis对象
 
 ```php
-$db = PoolManager::getInstance()->getPool(MysqlPool::class)->getObj(Config::getInstance()->getConf('MYSQL.POOL_TIME_OUT'));
+$db = \EasySwoole\Pool\Manager::getInstance()->get('mysql')->getObj();
 ```
 
 > 回收连接池对象
 
 ```php
-PoolManager::getInstance()->getPool(MysqlPool::class)->recycleObj($db);   
+\EasySwoole\Pool\Manager::getInstance()->get('mysql')->recycleObj($db);
 ```     

@@ -15,7 +15,6 @@ class RedisPool extends AbstractPool
 {
     /**
      * 创建redis连接池对象
-     * @return bool
      */
     protected function createObject()
     {

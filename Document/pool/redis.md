@@ -7,7 +7,6 @@
     'host' => '127.0.0.1',
     'port' => 6379,
     'password' => '',
-    'POOL_MAX_NUM' => 10
 ]
 ```
 
@@ -15,7 +14,7 @@
   
 在EasySwooleEvent.php的initialize方法注册redis连接池
 ```php
-PoolManager::getInstance()->register(RedisPool::class, Config::getInstance()->getConf('REDIS.POOL_MAX_NUM'));
+Manager::getInstance()->register(new RedisPool(new \EasySwoole\Pool\Config()), 'redis');
 ```  
 
 > redis连接池类
@@ -31,14 +30,13 @@ PoolManager::getInstance()->register(RedisPool::class, Config::getInstance()->ge
 
 namespace App\Utility\Pool;
 
-use EasySwoole\Component\Pool\AbstractPool;
 use EasySwoole\EasySwoole\Config;
+use EasySwoole\Pool\AbstractPool;
 
 class RedisPool extends AbstractPool
 {
     /**
      * 创建redis连接池对象
-     * @return bool
      */
     protected function createObject()
     {
@@ -75,10 +73,10 @@ class RedisPool extends AbstractPool
 namespace App\Utility\Pool;
 
 
-use EasySwoole\Component\Pool\PoolObjectInterface;
+use EasySwoole\Pool\ObjectInterface;
 use Swoole\Coroutine\Redis;
 
-class RedisObject extends Redis implements PoolObjectInterface
+class RedisObject extends Redis implements ObjectInterface
 {
     function gc()
     {
@@ -102,11 +100,11 @@ class RedisObject extends Redis implements PoolObjectInterface
 > 从连接池获取redis对象
 
 ```php
-$redis = PoolManager::getInstance()->getPool(RedisPool::class)->getObj();
+$redis = \EasySwoole\Pool\Manager::getInstance()->get('redis')->getObj();
 ```
 
 > 回收连接池对象
 
 ```php
-PoolManager::getInstance()->getPool(RedisPool::class)->recycleObj($redis);    
+\EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redis);    
 ```     
