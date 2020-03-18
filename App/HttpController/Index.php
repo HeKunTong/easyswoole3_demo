@@ -12,6 +12,7 @@ use EasySwoole\Curl\Request;
 use EasySwoole\EasySwoole\ServerManager;
 use EasySwoole\EasySwoole\Task\TaskManager;
 use EasySwoole\Http\AbstractInterface\Controller;
+use EasySwoole\HttpClient\HttpClient;
 use EasySwoole\Spl\SplString;
 use EasySwoole\Template\Render;
 
@@ -46,9 +47,11 @@ class Index extends Controller
             'outCharset' => 'utf-8'
         ];
         $url = $url.'?'.http_build_query($params);
-        $request = new Request($url);
-        $request->setUserOpt([CURLOPT_REFERER => 'https://y.qq.com/n/yqq/song/001xiJdl0t4NgO.html']);
-        $content = $request->exec()->getBody();
+        $client = new HttpClient($url);
+        $client->setTimeout(60);
+        $client->setConnectTimeout(30);
+        $response = $client->get(['referer' => 'https://y.qq.com/n/yqq/song/001xiJdl0t4NgO.html']);
+        $content = $response->getBody();
         $string = new SplString($content);
         $content = $string->regex('/\{.*\}/');
         $json = json_decode($content, true);
