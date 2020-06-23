@@ -8,19 +8,13 @@
 
 namespace App\Model;
 
+use EasySwoole\ORM\AbstractModel;
 
-use App\Utility\Pool\MysqlPoolObject;
-
-class BaseModel
+class BaseModel extends AbstractModel
 {
-    private $db;
-    function __construct(MysqlPoolObject $db)
-    {
-        $this->db = $db;
-    }
+    protected $tableName;
 
-    protected function getDb(): MysqlPoolObject {
-        return $this->db;
+    public function getTableName() {
+        return $this->tableName;
     }
-
 }

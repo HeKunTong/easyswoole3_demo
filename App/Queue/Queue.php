@@ -8,28 +8,26 @@
 
 namespace App\Queue;
 
-use App\Utility\Pool\RedisObject;
+use EasySwoole\Redis\Redis;
 
 class Queue
 {
     private $redis;
     static public $queue = 'queue';
 
-    function __construct(RedisObject $redis)
+    function __construct(Redis $redis)
     {
         $this->redis = $redis;
     }
 
     function rPop()
     {
-        $rs = $this->redis->rPop(self::$queue);
-        return $rs;
+        return $this->redis->rPop(self::$queue);
     }
 
     function lPush($data)
     {
-        $rs = $this->redis->lpush(self::$queue, $data);
-        return $rs;
+        return $this->redis->lpush(self::$queue, $data);
     }
 
 }

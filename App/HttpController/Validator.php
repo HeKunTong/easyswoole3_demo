@@ -23,8 +23,8 @@ class Validator extends REST
         ];
 
         $valid = new Validate();
-
         $valid->addColumn('name', '姓名必填');
-        $valid->validate($params);
+        $ret = $valid->validate($params);
+        $this->response()->write($ret);
     }
 }

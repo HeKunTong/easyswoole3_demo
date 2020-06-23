@@ -8,18 +8,19 @@
 
 namespace App\Model\User;
 
-
 use App\Model\BaseModel;
 
+/**
+ * Class UserModel
+ * @package App\Model\User
+ * @property $id
+ * @property $name
+ * @property $age
+ */
 class UserModel extends BaseModel
 {
-    protected $table = 'user';
-
-    function getList(){
-        return $this->getDb()->get($this->table);
-    }
-
-    function getUser(UserBean $user) {
-        return $this->getDb()->where('id', $user->getId())->getOne($this->table);
+    protected $tableName = 'user';
+    function getUser() {
+        return $this->get($this->id);
     }
 }

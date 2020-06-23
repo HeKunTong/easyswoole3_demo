@@ -27,19 +27,15 @@ class Duck extends Base
 
     public function users()
     {
-        $db = Manager::getInstance()->get('mysql')->defer();
-        $model = new UserModel($db);
-        $list = $model->getList();
+        $list = UserModel::create()->all();
         $this->writeJson(200, $list, '成功');
     }
 
     public function user()
     {
-        $db = Manager::getInstance()->get('mysql')->defer();
-        $bean = new UserBean();
-        $bean->setId(1);
-        $model = new UserModel($db);
-        $user = $model->getUser($bean);
+        $model = new UserModel();
+        $model->id = 2;
+        $user = $model->getUser();
         $this->writeJson(200, $user);
     }
 

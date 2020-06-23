@@ -8,18 +8,20 @@
 
 
 require_once "vendor/autoload.php";
+require_once "App/Utility/simple_dom_html.php";
 
-\EasySwoole\EasySwoole\Core::getInstance()->initialize();
-
-co::create(function() {
-    /**
-     * @var $redis \Swoole\Coroutine\Redis
-     */
-    $redis = \EasySwoole\Pool\Manager::getInstance()->get('redis')->getObj();
-
-    $redis->set('name', 'blank');
-    $result = $redis->get('name');
-    var_dump($result);
-
-    \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redis);
-});
+$url = 'https://list.jd.com/list.html';
+$params = [
+    'cat' => '9987,653,655',
+    'ev' => 'exbrand_Apple^',
+    'cid3' => '655',
+];
+$url = $url.'?'.http_build_query($params);
+$content = shell_exec("phantomjs template.js $url");
+file_put_contents('a.html', $content);
+$html = new simple_html_dom();
+$html->load($content);
+$curr = $html->find('.p-num a.curr', 0);
+$skip = $html->find('.p-skip b', 0);
+var_dump($curr->plaintext);
+var_dump($skip->plaintext);
