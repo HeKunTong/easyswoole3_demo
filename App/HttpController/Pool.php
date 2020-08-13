@@ -9,7 +9,6 @@
 namespace App\HttpController;
 
 use EasySwoole\Http\AbstractInterface\Controller;
-use EasySwoole\Pool\Manager;
 use EasySwoole\RedisPool\Redis;
 
 class Pool extends Controller
@@ -23,4 +22,5 @@ class Pool extends Controller
         $name = $redis->get('name');
         $this->response()->write($name);
     }
+
 }

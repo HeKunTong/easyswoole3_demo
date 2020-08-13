@@ -1,9 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: root
- * Date: 19-8-26
- * Time: 下午2:37
- */
+
+//全局bootstrap事件
+date_default_timezone_set('Asia/Shanghai');
 
 require_once EASYSWOOLE_ROOT."/App/Utility/simple_dom_html.php";

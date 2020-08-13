@@ -19,9 +19,9 @@ $params = [
 $url = $url.'?'.http_build_query($params);
 $content = shell_exec("phantomjs template.js $url");
 file_put_contents('a.html', $content);
-$html = new simple_html_dom();
-$html->load($content);
-$curr = $html->find('.p-num a.curr', 0);
-$skip = $html->find('.p-skip b', 0);
-var_dump($curr->plaintext);
-var_dump($skip->plaintext);
+//$html = new simple_html_dom();
+//$html->load($content);
+//$curr = $html->find('.p-num a.curr', 0);
+//$skip = $html->find('.p-skip b', 0);
+//var_dump($curr->plaintext);
+//var_dump($skip->plaintext);

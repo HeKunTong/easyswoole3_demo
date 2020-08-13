@@ -10,7 +10,6 @@ namespace App\Model\Jd;
 
 
 use App\Model\BaseModel;
-use EasySwoole\Spl\SplBean;
 
 class JdModel extends BaseModel
 {

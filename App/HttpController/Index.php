@@ -1,14 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: root
- * Date: 18-9-18
- * Time: 上午11:32
- */
+
 
 namespace App\HttpController;
 
-use EasySwoole\Curl\Request;
+
 use EasySwoole\EasySwoole\ServerManager;
 use EasySwoole\EasySwoole\Task\TaskManager;
 use EasySwoole\Http\AbstractInterface\Controller;
@@ -18,13 +13,24 @@ use EasySwoole\Template\Render;
 
 class Index extends Controller
 {
-    /**
-     * 输出字符串
-     */
-    function index()
+
+    public function index()
     {
-        // TODO: Implement index() method.
-        $this->response()->write('hello world');
+        $file = EASYSWOOLE_ROOT.'/vendor/easyswoole/easyswoole/src/Resource/Http/welcome.html';
+        if(!is_file($file)){
+            $file = EASYSWOOLE_ROOT.'/src/Resource/Http/welcome.html';
+        }
+        $this->response()->write(file_get_contents($file));
+    }
+
+    protected function actionNotFound(?string $action)
+    {
+        $this->response()->withStatus(404);
+        $file = EASYSWOOLE_ROOT.'/vendor/easyswoole/easyswoole/src/Resource/Http/404.html';
+        if(!is_file($file)){
+            $file = EASYSWOOLE_ROOT.'/src/Resource/Http/404.html';
+        }
+        $this->response()->write(file_get_contents($file));
     }
 
     /**
@@ -88,5 +94,4 @@ class Index extends Controller
         ServerManager::getInstance()->getSwooleServer()->reload();
         $this->response()->write('reload');
     }
-
 }
