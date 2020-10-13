@@ -5,7 +5,10 @@ namespace EasySwoole\EasySwoole;
 
 
 use App\Queue\Queue;
+use App\Task\JdClient;
+use App\Task\JdGoodClient;
 use App\Template;
+use EasySwoole\Component\Timer;
 use EasySwoole\EasySwoole\AbstractInterface\Event;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\ORM\Db\Connection;
@@ -40,25 +43,19 @@ class EasySwooleEvent implements Event
 
         $register->add(EventRegister::onWorkerStart, function (\swoole_server $server, $workerId) {
             if ($workerId === 0) {
-//                \Co::create(function (){
-//                    $client = new JdClient();     // 协程客户端
-//                    $client->run();
-//                });
-//                Timer::getInstance()->after(5 * 1000, function () {
-//                    // 定时任务
-//                    $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
-//                        \Co::create(function () use (&$timer){
-//                            $goodTask = new JdGoodClient(); // 协程客户端
-//                            $res = $goodTask->run();
-//                            if (!$res) {
-//                                if ($timer) {
-//                                    Timer::getInstance()->clear($timer);
-//                                }
-//                                echo 'end-----'.PHP_EOL;
-//                            }
-//                        });
-//                    });
-//                });
+                \Co::create(function (){
+                    $client = new JdClient();     // 协程客户端
+                    $client->run();
+                });
+                Timer::getInstance()->after(5 * 1000, function () {
+                    // 定时任务
+                    $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
+                        \Co::create(function () use (&$timer){
+                            $goodTask = new JdGoodClient(); // 协程客户端
+                            $goodTask->run();
+                        });
+                    });
+                });
             }
         });
 

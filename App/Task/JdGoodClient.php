@@ -8,30 +8,21 @@
 
 namespace App\Task;
 
-
-use App\Model\Jd\JdBean;
-use App\Model\Jd\JdModel;
+use App\Model\Jd;
 use App\Queue\Queue;
 use EasySwoole\HttpClient\HttpClient;
-use EasySwoole\Pool\Manager;
+use EasySwoole\RedisPool\Redis;
 
 class JdGoodClient
 {
-    private $db;
-
-    function __construct()
-    {
-        $this->db = Manager::getInstance()->get('mysql')->defer();
-    }
-
-    function run() {
-        $redis = Manager::getInstance()->get('redis')->defer();
+    public function run() {
+        $redis = Redis::defer('redis');
         $queue = new Queue($redis);
         $task = $queue->rPop();
         if ($task) {
             try {
                 echo 'task-----'.$task.PHP_EOL;
-                $this->handle($task);
+                $this->store($task);
             } catch (\Exception $exception) {   // 失败重回队列任务
                 echo 'task-----'.$task.PHP_EOL;
                 echo 'fail-----'.$task.PHP_EOL;
@@ -43,63 +34,29 @@ class JdGoodClient
         }
     }
 
-    private function handle($url)
-    {
-        $client = new HttpClient($url);
-        $client->setTimeout(3);
+    public function store($url) {
+        $client = new HttpClient();
+        $client->setHeader('user-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36');
+        $client->setUrl($url);
         $ret = $client->get();
-        if ($ret->getErrMsg()) {
-            throw new \Exception($ret->getErrMsg());
-        } else {
-            $body = $ret->getBody();
+        if (!$ret->getErrMsg()) {
             $html = new \simple_html_dom();
-            $html->load($body);
+            $html->load($ret->getBody());
             $list = $html->find('ul.gl-warp', 0);
             $len = count($list->find('.gl-item'));
-            $skus = [];
             for ($i = 0; $i < $len; $i++) {
                 $item = $list->find('.gl-item', $i);
-                $sku = $item->find('.j-sku-item', 0)->getAttribute('data-sku');
-                $skus[] = 'J_'.$sku;
+                $sku = $item->getAttribute('data-sku');
                 $name = trim($item->find('.p-name em', 0)->plaintext);
-                $shop = $item->find('.p-shop', 0)->getAttribute('data-shop_name');
-                $data = [
-                    'name' => $name,
-                    'shop' => $shop,
-                    'sku' => $sku,
-                ];
-                $bean = new JdBean($data);
-                $model = new JdModel($this->db);
-                $model->insert($bean);
-            }
-            $this->getPrice($skus);
-        }
-    }
-
-    private function getPrice($skus)
-    {
-        $url = 'https://p.3.cn/prices/mgets';
-        $params = [
-            'skuIds' => implode(',', $skus)
-        ];
-        $url = $url.'?'.http_build_query($params);
-
-        $client = new HttpClient($url);
-        $client->setTimeout(3);
-        $ret = $client->get();
-        if ($ret->getErrMsg()) {
-            throw new \Exception($ret->getErrMsg());
-        } else {
-            $body = $ret->getBody();
-            $result = json_decode($body, true);
-
-            foreach ($result as $item) {
-                $sku = substr($item['id'], 2);
-                $price = floatval($item['p']) * 100;
-                $bean = new JdBean();
-                $bean->setSku($sku);
-                $model = new JdModel($this->db);
-                $model->update($bean, $price);
+                $shopNode = $item->find('.curr-shop', 0);
+                $shop = $shopNode ? $shopNode->plaintext : '';
+                $price = floatval($item->find('.p-price i', 0)->plaintext) * 100;
+                $model = new Jd();
+                $model->name = $name;
+                $model->shop = $shop;
+                $model->sku = $sku;
+                $model->price = $price;
+                $model->save();
             }
         }
     }

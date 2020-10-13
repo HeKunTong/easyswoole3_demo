@@ -9,11 +9,8 @@
 namespace App\HttpController;
 
 
-use App\Model\User\UserModel;
-use App\Model\User\UserBean;
-use App\Utility\Pool\MysqlPool;
+use App\Model\User;
 use EasySwoole\EasySwoole\ServerManager;
-use EasySwoole\Pool\Manager;
 
 class Duck extends Base
 {
@@ -27,13 +24,13 @@ class Duck extends Base
 
     public function users()
     {
-        $list = UserModel::create()->all();
+        $list = User::create()->all();
         $this->writeJson(200, $list, '成功');
     }
 
     public function user()
     {
-        $model = new UserModel();
+        $model = new User();
         $model->id = 2;
         $user = $model->getUser();
         $this->writeJson(200, $user);

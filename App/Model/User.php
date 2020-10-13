@@ -6,18 +6,16 @@
  * Time: 下午4:29
  */
 
-namespace App\Model\User;
-
-use App\Model\BaseModel;
+namespace App\Model;
 
 /**
- * Class UserModel
+ * Class User
  * @package App\Model\User
  * @property $id
  * @property $name
  * @property $age
  */
-class UserModel extends BaseModel
+class User extends BaseModel
 {
     protected $tableName = 'user';
     function getUser() {

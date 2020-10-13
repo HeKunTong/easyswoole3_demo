@@ -6,16 +6,11 @@ if (args.length < 2) {
     phantom.exit();
 }
 
-page.customHeaders = {
-    refer: 'https://list.jd.com/list.html?cat=9987,653,655',
-};
+page.settings.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36';
 
 page.open(args[1], function(status) {
     if(status === "success") {
-        page.evaluate(function() {
-            var output = page.content;
-            console.log(output);
-        });
+        console.log(page.content);
+        phantom.exit();
     }
-    phantom.exit();
 });
