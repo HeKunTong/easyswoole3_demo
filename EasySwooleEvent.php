@@ -33,29 +33,29 @@ class EasySwooleEvent implements Event
     public static function mainServerCreate(EventRegister $register)
     {
         // 清空数据
-        $conf = Config::getInstance()->getConf('REDIS');
-        $redis = new \Redis();
-        $redis->connect($conf['host'], $conf['port']);
-        if (!empty($conf['auth'])) {
-            $redis->auth($conf['auth']);
-        }
-        $redis->del(Queue::$queue);
+//        $conf = Config::getInstance()->getConf('REDIS');
+//        $redis = new \Redis();
+//        $redis->connect($conf['host'], $conf['port']);
+//        if (!empty($conf['auth'])) {
+//            $redis->auth($conf['auth']);
+//        }
+//        $redis->del(Queue::$queue);
 
         $register->add(EventRegister::onWorkerStart, function (\swoole_server $server, $workerId) {
             if ($workerId === 0) {
-                \Co::create(function (){
-                    $client = new JdClient();     // 协程客户端
-                    $client->run();
-                });
-                Timer::getInstance()->after(5 * 1000, function () {
-                    // 定时任务
-                    $timer = Timer::getInstance()->loop(1 * 1000, function () use (&$timer) {
-                        \Co::create(function () use (&$timer){
-                            $goodTask = new JdGoodClient(); // 协程客户端
-                            $goodTask->run();
-                        });
-                    });
-                });
+//                \Co::create(function (){
+//                    $client = new JdClient();     // 协程客户端
+//                    $client->run();
+//                });
+//                Timer::getInstance()->after(5 * 1000, function () {
+//                    // 定时任务
+//                    $timer = Timer::getInstance()->loop(3 * 1000, function () use (&$timer) {
+//                        \Co::create(function () use (&$timer){
+//                            $goodTask = new JdGoodClient(); // 协程客户端
+//                            $goodTask->run();
+//                        });
+//                    });
+//                });
             }
         });
 
