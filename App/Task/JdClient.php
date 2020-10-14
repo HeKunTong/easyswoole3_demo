@@ -55,10 +55,10 @@ class JdClient
                 $last = intval($match[1][0]);
                 $redis = Redis::defer('redis');
                 $queue = new Queue($redis);
-                $i = 3;
+                $i = 2;
                 while ($i <= $last) {
                     $queue->lPush($url.'&page='.$i);
-                    $i = $i + 2;
+                    $i = $i + 1;
                 }
             }
         }
