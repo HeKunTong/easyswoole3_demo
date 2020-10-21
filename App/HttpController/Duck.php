@@ -9,8 +9,10 @@
 namespace App\HttpController;
 
 
+use App\Model\Jd;
 use App\Model\User;
 use EasySwoole\EasySwoole\ServerManager;
+use EasySwoole\Http\Message\Status;
 
 class Duck extends Base
 {
@@ -25,7 +27,7 @@ class Duck extends Base
     public function users()
     {
         $list = User::create()->all();
-        $this->writeJson(200, $list, '成功');
+        $this->writeJson(Status::CODE_OK, $list, '成功');
     }
 
     public function user()
@@ -33,7 +35,12 @@ class Duck extends Base
         $model = new User();
         $model->id = 2;
         $user = $model->getUser();
-        $this->writeJson(200, $user);
+        $this->writeJson(Status::CODE_OK, $user);
+    }
+
+    public function jd() {
+        $list = Jd::create()->all();
+        $this->writeJson(Status::CODE_OK, $list);
     }
 
 }

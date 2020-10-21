@@ -4,12 +4,14 @@
 namespace EasySwoole\EasySwoole;
 
 
+use App\Crontab\TimerTask;
 use App\Queue\Queue;
 use App\Task\JdClient;
 use App\Task\JdGoodClient;
 use App\Template;
 use EasySwoole\Component\Timer;
 use EasySwoole\EasySwoole\AbstractInterface\Event;
+use EasySwoole\EasySwoole\Crontab\Crontab;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\ORM\Db\Connection;
 use EasySwoole\ORM\DbManager;
@@ -61,6 +63,9 @@ class EasySwooleEvent implements Event
 
         Render::getInstance()->getConfig()->setRender(new Template());
         Render::getInstance()->attachServer(ServerManager::getInstance()->getSwooleServer());
+
+        // 任务计划
+        Crontab::getInstance()->addTask(TimerTask::class);
 
         // 开启热重启进程
         // ServerManager::getInstance()->getSwooleServer()->addProcess((new Inotify('autoReload', ['disableInotify' => false]))->getProcess());

@@ -28,9 +28,6 @@ class JdGoodClient
                 echo 'fail-----'.$task.PHP_EOL;
                 $queue->lPush($task);
             }
-            return true;
-        } else {
-            return false;
         }
     }
 
