@@ -11,12 +11,12 @@ namespace App\Task;
 use App\Model\Jd;
 use App\Queue\Queue;
 use EasySwoole\HttpClient\HttpClient;
-use EasySwoole\RedisPool\Redis;
+use EasySwoole\RedisPool\RedisPool;
 
 class JdGoodClient
 {
     public function run() {
-        $redis = Redis::defer('redis');
+        $redis = RedisPool::defer('redis');
         $queue = new Queue($redis);
         $task = $queue->rPop();
         if ($task) {

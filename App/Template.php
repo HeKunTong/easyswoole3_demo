@@ -26,7 +26,7 @@ class Template implements RenderInterface
         $this->template = new \think\Template($config);
     }
 
-    public function render(string $template, array $data = [], array $options = []): ?string
+    public function render(string $template, ?array $data = [], ?array $options = []): ?string
     {
         // TODO: Implement render() method.
         ob_start();
@@ -36,13 +36,7 @@ class Template implements RenderInterface
         return $content;
     }
 
-    public function afterRender(?string $result, string $template, array $data = [], array $options = [])
-    {
-        // TODO: Implement afterRender() method.
-    }
+    public function onException(\Throwable $throwable,$arg):string {
 
-    public function onException(\Throwable $throwable): string
-    {
-        // TODO: Implement onException() method.
     }
 }

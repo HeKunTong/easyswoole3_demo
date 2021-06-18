@@ -11,12 +11,11 @@ use App\Task\JdGoodClient;
 use App\Template;
 use EasySwoole\Component\Timer;
 use EasySwoole\EasySwoole\AbstractInterface\Event;
-use EasySwoole\EasySwoole\Crontab\Crontab;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\ORM\Db\Connection;
 use EasySwoole\ORM\DbManager;
 use EasySwoole\Redis\Config\RedisConfig;
-use EasySwoole\RedisPool\Redis;
+use EasySwoole\RedisPool\RedisPool;
 use EasySwoole\Template\Render;
 
 class EasySwooleEvent implements Event
@@ -29,7 +28,7 @@ class EasySwooleEvent implements Event
 
         // redis 连接注册
         $redisConfig = Config::getInstance()->getConf('REDIS');
-        Redis::getInstance()->register('redis', new RedisConfig($redisConfig));
+        RedisPool::getInstance()->register(new RedisConfig($redisConfig), 'redis');
     }
 
     public static function mainServerCreate(EventRegister $register)
@@ -65,7 +64,7 @@ class EasySwooleEvent implements Event
         Render::getInstance()->attachServer(ServerManager::getInstance()->getSwooleServer());
 
         // 任务计划
-        Crontab::getInstance()->addTask(TimerTask::class);
+        // Crontab::getInstance()->addTask(TimerTask::class);
 
         // 开启热重启进程
         // ServerManager::getInstance()->getSwooleServer()->addProcess((new Inotify('autoReload', ['disableInotify' => false]))->getProcess());

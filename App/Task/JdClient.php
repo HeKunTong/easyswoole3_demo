@@ -12,7 +12,7 @@ namespace App\Task;
 use App\Model\Jd;
 use App\Queue\Queue;
 use EasySwoole\HttpClient\HttpClient;
-use EasySwoole\RedisPool\Redis;
+use EasySwoole\RedisPool\RedisPool;
 
 class JdClient
 {
@@ -53,7 +53,7 @@ class JdClient
             preg_match_all('/s\.init\(\d+, (\d+),/', $ret->getBody(), $match);
             if (isset($match[1]) && isset($match[1][0])) {
                 $last = intval($match[1][0]);
-                $redis = Redis::defer('redis');
+                $redis = RedisPool::defer('redis');
                 $queue = new Queue($redis);
                 $i = 2;
                 while ($i <= $last) {

@@ -11,7 +11,8 @@
         "topthink/think-template": "^2.0",
         "easyswoole/orm": "^1.4",
         "easyswoole/redis-pool": "^2.1",
-        "easyswoole/validate": "^1.2"
+        "easyswoole/validate": "^1.2",
+        "smalot/pdfparser": "^0.18.1"
     },
     "require-dev": {},
     "license": "",
